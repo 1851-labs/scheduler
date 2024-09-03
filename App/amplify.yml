@@ -1,0 +1,32 @@
+# To edit these build settings, edit /App/amplify.yml
+version: 1
+applications:
+  - appRoot: App
+    frontend:
+      buildPath: App/
+      phases:
+        preBuild:
+          commands:
+            - npm ci
+        build:
+          commands:
+            - env | grep -e CONVEX_DEPLOYMENT >> .env.production || { echo "Error - CONVEX_DEPLOYMENT not found in the amplify environment variables" >&2; exit 1; }
+            - env | grep -e NEXT_PUBLIC_CONVEX_URL >> .env.production || { echo "Error - NEXT_PUBLIC_CONVEX_URL not found in the amplify environment variables" >&2; exit 1; }
+            - env | grep -e NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY >> .env.production || { echo "Error - NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY not found in the amplify environment variables" >&2; exit 1; }
+            - env | grep -e CLERK_SECRET_KEY >> .env.production || { echo "Error - CLERK_SECRET_KEY not found in the amplify environment variables" >&2; exit 1; }
+            - env | grep -e CLERK_ISSUER_URL >> .env.production || { echo "Error - CLERK_ISSUER_URL not found in the amplify environment variables" >&2; exit 1; }
+            - env | grep -e OPENAI_API_KEY >> .env.production || { echo "Error - OPENAI_API_KEY not found in the amplify environment variables" >&2; exit 1; }
+            - env | grep -e NEXT_PUBLIC_POSTHOG_KEY >> .env.production || { echo "Error - NEXT_PUBLIC_POSTHOG_KEY not found in the amplify environment variables" >&2; exit 1; }
+            - env | grep -e NEXT_PUBLIC_POSTHOG_HOST >> .env.production || { echo "Error - NEXT_PUBLIC_POSTHOG_HOST not found in the amplify environment variables" >&2; exit 1; }
+            - env | grep -e NEXT_PUBLIC_SENTRY_AUTH_TOKEN >> .env.production || { echo "Error - SENTRY_AUTH_TOKEN not found in the amplify environment variables" >&2; exit 1; }
+            - env | grep -e NEXT_PUBLIC_SENTRY_DSN >> .env.production || { echo "Error - SENTRY_DSN not found in the amplify environment variables" >&2; exit 1; }
+
+            - npm run build
+      artifacts:
+        baseDirectory: .next
+        files:
+          - "**/*"
+      cache:
+        paths:
+          - .next/cache/**/*
+          - node_modules/**/*

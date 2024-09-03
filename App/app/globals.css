@@ -1,0 +1,291 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Lexend';
+  src: url('../styles/fonts/Lexend-VariableFont_wght.ttf') format('truetype');
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
+  font-family: 'Lexend', sans-serif;
+}
+
+body {
+  background: #FFFDDE;
+}
+
+.max-width {
+  @apply mx-auto max-w-[1536px] px-5 md:px-6 lg:px-8 xl:px-10 2xl:px-0;
+}
+/* https://colorhunt.co/palette/d9d7f1fffddee7fbbeffcbcb */
+.primary-gradient {
+  background: linear-gradient(
+    300deg,
+    #D9D7F1 -9.43%,
+    #333 -9.42%,
+    rgba(231, 251, 190, 0.50) 4.63%,
+    rgba(217, 215, 241, 0.50) 127.55%
+  );
+}
+
+.primary-shadow {
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+}
+
+.progress-bar {
+  background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' stroke='%2367028BFF' stroke-width='3' stroke-dasharray='6%2c 14' stroke-dashoffset='0' stroke-linecap='butt'/%3e%3c/svg%3e");
+}
+
+.custom-nav-shadow {
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+}
+
+.time-machine-gradient {
+  background: linear-gradient(
+    143deg,
+    #D9D7F1 8.37%,
+    rgba(17,19,101, 0.62) 71.62%
+  );
+  filter: blur(13.100000381469727px);
+}
+
+.time-machine-inactive {
+  opacity: 0.1;
+}
+
+.recording-box {
+  background: linear-gradient(
+    143deg,
+    #e648f4 8.37%,
+    rgba(73, 80, 240, 0.62) 71.62%
+  );
+  filter: blur(13.100000381469727px);
+}
+
+.action-btn-active {
+  border: 0.3px solid rgba(158, 158, 158, 0.4);
+  background: #ebecef;
+  box-shadow:
+    1px 1px 5px 1px rgba(24, 24, 24, 0.68) inset,
+    0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+}
+
+.action-btn {
+  border: 0.3px solid rgba(158, 158, 158, 0.4);
+  background: rgba(255, 240, 240, 0.4);
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+}
+
+@keyframes rotate360 {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.record-animation {
+  animation: rotate360 infinite 5s linear;
+}
+
+@keyframes ping {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.2);
+    opacity: 0.5;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.ping-animation div {
+  animation: ping 1.5s infinite ease-in-out;
+}
+
+@media (max-width: 768px) {
+  .custom-nav-shadow {
+    box-shadow: none;
+  }
+}
+
+.city-selector {
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  border-radius: 10px;
+}
+
+.time-selector {
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  border-radius: 10px;
+}
+
+.time-selector-disabled {
+  opacity: 0.5;
+}
+
+.polaroid {
+  background: #fff;
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  border-radius: 10px;
+  padding: 1rem;
+  position:relative;
+}
+
+.polaroid .polaroid-image {
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.polaroid .polaroid-caption {
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: #333;
+}
+
+.polaroid .polaroid-caption.disabled {
+  color: #FFF;
+}
+
+.polaroid .polaroid-caption.generating {
+  color: #AAA;
+}
+
+.action-btn-container .disabled button {
+  cursor: not-allowed;
+  opacity: 0.1;
+}
+
+.background-blur .background-gradient-blur {
+  opacity: 0.2;
+  background: radial-gradient(54.14% 54.14% at 50% 50%, #D9D7F1 0%, rgba(103, 2, 139, 0.02) 100%);
+  filter: blur(167px);
+}
+
+.background-blur.animate-pulse .background-gradient-blur {
+  opacity: 1.0;
+  background: radial-gradient(54.14% 54.14% at 50% 50%, #D9D7F1	 0%, rgba(103, 2, 139, 0.02) 100%);
+  filter: blur(187px);
+}
+
+/* 
+The class below can be applied to regular
+HTML elements as follows:
+
+<div class="bg-background text-foreground">
+Some text here
+</div>
+
+This will apply the background color specified 
+below to the background and the foreground color
+specified below to the foreground text.
+*/
+
+@layer base {
+  :root {
+    /* The color used for the website's background */
+    --background: 56 100% 94%;
+    
+    /* The color used for foreground objects like text */
+    --foreground: 222.2 47.4% 11.2%;
+    
+    /* The color used for muted objects, like disabled buttons */
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    
+    /* The color used for popover objects like modals or sheets */
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 47.4% 11.2%;
+    
+    /* The color used for borders */
+    --border: 214.3 31.8% 91.4%;
+
+    /* The color used for the background of input fields */
+    --input: 214.3 31.8% 91.4%;
+    
+    /* The color used for the background of cards */
+    --card: 47 71% 90%;
+
+    /* The color used for foreground objects of cards (i.e. text) */
+    --card-foreground: 222.2 47.4% 11.2%;
+    
+    /* The primary color in the color theme */
+    --primary: 201 100% 14%;
+    --primary-foreground: 210 40% 98%;
+    
+    /* The secondary color in the color theme */
+    --secondary: 203 39% 57%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    
+    /* Color theme accent color */
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    
+    /* Color used for warnings or delete buttons */
+    --destructive: 356 83% 41%;
+    --destructive-foreground: 210 40% 98%;
+    
+    --ring: 215 20.2% 65.1%;
+    
+    /* The border radius used for buttons */
+    --radius: 0.5rem;
+  }
+ 
+  .dark {
+    /* Same as the properties above but only used for darkmode */
+    --background: 224 71% 4%;
+    --foreground: 213 31% 91%;
+ 
+    --muted: 223 47% 11%;
+    --muted-foreground: 215.4 16.3% 56.9%;
+ 
+    --accent: 216 34% 17%;
+    --accent-foreground: 210 40% 98%;
+ 
+    --popover: 224 71% 4%;
+    --popover-foreground: 215 20.2% 65.1%;
+ 
+    --border: 216 34% 17%;
+    --input: 216 34% 17%;
+ 
+    --card: 224 71% 4%;
+    --card-foreground: 213 31% 91%;
+ 
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 1.2%;
+ 
+    --secondary: 222.2 47.4% 11.2%;
+    --secondary-foreground: 210 40% 98%;
+ 
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+ 
+    --ring: 216 34% 17%;
+ 
+    --radius: 0.5rem;
+  }
+}
+ 
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}

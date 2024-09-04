@@ -7,6 +7,8 @@ import { Dashboard } from "@/components/ui/Dashboard";
 import Header from "@/components/ui/Header";
 import ReactPixel from "react-facebook-pixel";
 import { GoogleLogin } from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
+import posthog from "posthog-js";
 
 const Banner = () => {
   const numIdeas = useQuery(api.ideas.getAppIdeas);
@@ -16,6 +18,7 @@ const Banner = () => {
   const [appDescription, setAppDescription] = useState("");
   const [results, setResults]: any[] = useState([]);
   const [promptCount, setPromptCount] = useState(0);
+  const [userProfile, setUserProfile] = useState<any>(null);
 
   const handleMakeIdea = async () => {
     if (!isLoading) {
@@ -36,12 +39,42 @@ const Banner = () => {
       void callBackend();
     }
   };
+  interface GoogleUser {
+    sub: string;
+    name: string;
+    given_name: string;
+    family_name: string;
+    picture: string;
+    email: string;
+  }
 
+  //TODO: could consider adding google tap on sign in
   const responseMessage = (response: any) => {
-    console.log(response);
+    try {
+      const decoded: GoogleUser = jwtDecode(response.credential);
+      console.log("User Information:", decoded);
+      setUserProfile(decoded);
+    } catch (error) {
+      console.error("Error decoding JWT:", error);
+    }
+
+    console.log("response", response);
+    posthog.capture("user-clicked-signin");
   };
+
+  //used to debounce the response message so it isnt called too many times (picture wasn't displaying)
+  function debounce(func: Function, wait: number) {
+    let timeout: NodeJS.Timeout;
+    return function (this: any, ...args: any[]) {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+  }
+
+  const debouncedResponseMessage = debounce(responseMessage, 300);
+
   const errorMessage = () => {
-    console.log("error");
+    console.log("error!!!!!");
   };
 
   return (
@@ -51,9 +84,27 @@ const Banner = () => {
       <div className="relative h-[350px] w-full  px-4 md:h-[605px] md:px-6 lg:px-8 xl:px-10 2xl:px-0">
         <div className="relative w-full px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-0 bg-red-200"></div>
         <div className="flex w-full flex-col items-center justify-center mt-20">
-          <button>sign in</button>
-          {/* <GoogleLogin onSuccess={responseMessage} onError={errorMessage} /> */}
-          <h1 className=" text-center text-4xl font-medium tracking-tighter text-dark lg:text-6xl">
+          <GoogleLogin onSuccess={responseMessage} onError={errorMessage} />
+          {userProfile && (
+            <div className="mt-4 p-4 border rounded shadow">
+              <h2 className="text-2xl font-bold">User Profile</h2>
+              <p>
+                <strong>ID:</strong> {userProfile.sub}
+              </p>
+              <p>
+                <strong>Name:</strong> {userProfile.name}
+              </p>
+              <p>
+                <strong>Email:</strong> {userProfile.email}
+              </p>
+              <img
+                src={userProfile.picture}
+                alt="Profile Image"
+                className="rounded-full h-6 w-6"
+              />
+            </div>
+          )}
+          {/* <h1 className=" text-center text-4xl font-medium tracking-tighter text-dark lg:text-6xl">
             At 1851 Labs, we've come up with {numIdeas} app ideas... Hooray!
           </h1>
           <button
@@ -92,7 +143,7 @@ const Banner = () => {
                 </option>
               ))}
             </select>
-          </label>
+          </label> */}
         </div>
 
         {/* background gradient */}

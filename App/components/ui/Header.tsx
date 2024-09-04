@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useUser } from '@clerk/clerk-react';
-import Link from 'next/link';
-import { UserNav } from './UserNav';
-import { useConvexAuth } from 'convex/react';
+import { useUser } from "@clerk/clerk-react";
+import Link from "next/link";
+import { UserNav } from "./UserNav";
+import { useConvexAuth } from "convex/react";
 
 const Header = () => {
   const { isLoading } = useConvexAuth();
@@ -22,7 +22,7 @@ const Header = () => {
             className="h-5 w-5 md:h-8 md:w-8"
           />
           <h1 className="text-xl font-medium text-[#25292F] md:text-3xl">
-            App Template
+            Scheduler
           </h1>
         </Link>
         <Link href="/cid">cid Tracker</Link>
@@ -62,3 +62,4 @@ const Header = () => {
 };
 
 export default Header;
+

@@ -28,19 +28,19 @@ export default function CalendarCard({
       <CardHeader>
         <CardTitle>{title}</CardTitle>
         <CardDescription>
-          <div className="flex items-center gap-2">
+          <span className="flex items-center gap-2">
             <Calendar className="w-4 h-4 text-muted-foreground" />
             <span className="text-muted-foreground">{date}</span>
-          </div>
-          <div className="flex items-center gap-2">
+          </span>
+          <span className="flex items-center gap-2">
             <Clock className="w-4 h-4 text-muted-foreground" />
             <span className="text-muted-foreground">{time}</span>
-          </div>
+          </span>
           {location && (
-            <div className="flex items-center gap-2">
+            <span className="flex items-center gap-2">
               <MapPin className="w-4 h-4 text-muted-foreground" />
               <span className="text-muted-foreground">{location}</span>
-            </div>
+            </span>
           )}
         </CardDescription>
       </CardHeader>

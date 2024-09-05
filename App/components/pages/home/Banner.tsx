@@ -11,6 +11,7 @@ import { useGoogleLogin } from "@react-oauth/google";
 
 import posthog from "posthog-js";
 import CalendarCard from "@/components/ui/CalendarCard";
+import { Button } from "@/components/shadcn/Button";
 
 const Banner = () => {
   const numIdeas = useQuery(api.ideas.getAppIdeas);
@@ -80,8 +81,12 @@ const Banner = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
+        const now = new Date();
+        const today = now.toISOString();
+        console.log(now, "  ", today);
+
         const response = await fetch(
-          "https://www.googleapis.com/calendar/v3/calendars/primary/events",
+          `https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${today}&orderBy=startTime&singleEvents=true`,
           {
             method: "GET",
             headers: {
@@ -106,6 +111,8 @@ const Banner = () => {
     }
   }, [accessToken]);
 
+  const upcomingEvents = events.slice(0, 5);
+
   //TODO: format to using words to represent date
   const formatDate = (dateTime: string) => {
     const dateObj = new Date(dateTime);
@@ -117,12 +124,74 @@ const Banner = () => {
     return dateObj.toLocaleTimeString(); // Format time
   };
 
+  const createEvent = async () => {
+    if (!accessToken) {
+      console.error("Access token is missing. Please log in first.");
+      return;
+    }
+
+    // Define the event details
+    const event = {
+      summary: "Sample Event 2",
+      location: "221B Baker Street, London, UK",
+      description: "This is an event created via Google Calendar API.",
+      start: {
+        dateTime: "2024-09-08T09:00:00-07:00",
+        timeZone: "America/Los_Angeles",
+      },
+      end: {
+        dateTime: "2024-09-08T10:00:00-07:00",
+        timeZone: "America/Los_Angeles",
+      },
+      attendees: [
+        { email: "attendee1@example.com" },
+        { email: "attendee2@example.com" },
+      ],
+      reminders: {
+        useDefault: false,
+        overrides: [
+          { method: "email", minutes: 24 * 60 },
+          { method: "popup", minutes: 10 },
+        ],
+      },
+    };
+
+    try {
+      // Send the request to create the event using fetch
+      const response = await fetch(
+        "https://www.googleapis.com/calendar/v3/calendars/primary/events",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(event),
+        }
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(
+          `Error creating event: ${response.status} ${response.statusText}`,
+          errorText
+        );
+        throw new Error(`Error creating event: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log("Event created:", data.htmlLink);
+    } catch (error) {
+      console.error("Error creating event:", error);
+    }
+  };
+
   return (
     // <Dashboard>
     <>
       <Header />
       {/* take these out for now: h-[350px]  md:h-[605px]*/}
-      <div className="relative  w-full px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-0">
+      <div className="relative min-h-[350px] md:min-h-[605px] w-full px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-0">
         <div className="relative w-full px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-0 bg-red-200"></div>
         <div className="flex w-full flex-col items-center justify-center mt-20">
           <button
@@ -131,9 +200,13 @@ const Banner = () => {
           >
             Sign in with Google 🚀{" "}
           </button>
-
+          <div className="m-4">
+            <Button onClick={createEvent} disabled={!accessToken}>
+              Create Event
+            </Button>
+          </div>
           {userProfile && (
-            <div className="mt-4 p-4 border rounded shadow">
+            <div className="mt-4 p-4 border border-card rounded shadow">
               <h2 className="text-2xl font-bold">User Profile</h2>
               <p>
                 <strong>ID:</strong> {userProfile.sub}
@@ -154,9 +227,17 @@ const Banner = () => {
           <div>
             {accessToken && (
               <div className="m-4">
-                <h2 className="pb-4">Calendar Events</h2>
+                <h2 className="pb-4">Upcoming Events</h2>
                 <ul className="flex-col space-y-4">
-                  {events.map((event) => {
+                  {upcomingEvents.map((event) => {
+                    // Log  details of each event - temporary for debugging
+                    // console.log("Event Details:", {
+                    //   event,
+                    // });
+                    if (!event.summary) {
+                      return null; // Skip rendering this event
+                    }
+
                     return (
                       <li key={event.id}>
                         <CalendarCard

@@ -7,13 +7,8 @@ import { Dashboard } from "@/components/ui/Dashboard";
 import Header from "@/components/ui/Header";
 import ReactPixel from "react-facebook-pixel";
 
-import { GoogleLogin } from "@react-oauth/google";
 import { useGoogleLogin } from "@react-oauth/google";
 
-import { listEvents } from "@/lib/google";
-import { google } from "googleapis";
-
-import { jwtDecode } from "jwt-decode";
 import posthog from "posthog-js";
 
 const Banner = () => {
@@ -49,19 +44,6 @@ const Banner = () => {
     }
   };
 
-  // const LoginButton = ({ onSuccess }: { onSuccess: (token: string) => void }) => {
-  //   const login = useGoogleLogin({
-  //     onSuccess: (tokenResponse) => {
-  //       console.log(tokenResponse.access_token);
-  //       onSuccess(tokenResponse.access_token);
-  //     },
-  //     onError: (error) => console.log(error),
-  //     scope: "https://www.googleapis.com/auth/calendar", // Scope for Calendar API
-  //   });
-
-  //   return <button onClick={() => login()}>Login with Google</button>;
-  // };
-
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       console.log(tokenResponse);
@@ -82,8 +64,10 @@ const Banner = () => {
 
         const userInfo = await response.json();
         console.log(userInfo);
+
         setUserProfile(userInfo);
         setAccessToken(tokenResponse.access_token);
+        posthog.capture("user-clicked-signin");
       } catch (error) {
         console.error("Error fetching user info:", error);
       }
@@ -121,82 +105,6 @@ const Banner = () => {
     }
   }, [accessToken]);
 
-  // interface GoogleUser {
-  //   sub: string;
-  //   name: string;
-  //   given_name: string;
-  //   family_name: string;
-  //   picture: string;
-  //   email: string;
-  // }
-
-  // // const fetchEvents = async (token: string) => {
-  // //   try {
-  // //     const fetchedEvents = await listEvents(token);
-  // //     setEvents(fetchedEvents);
-  // //   } catch (error) {
-  // //     console.error("Error fetching events:", error);
-  // //   }
-  // // };
-
-  // const testAccessToken = async (accessToken: string) => {
-  //   try {
-  //     const auth = new google.auth.OAuth2();
-  //     auth.setCredentials({ access_token: accessToken });
-
-  //     const calendar = google.calendar({ version: "v3", auth });
-  //     const res = await calendar.events.list({
-  //       calendarId: "primary",
-  //       timeMin: new Date().toISOString(),
-  //       maxResults: 1,
-  //       singleEvents: true,
-  //       orderBy: "startTime",
-  //     });
-
-  //     if (res.status === 200) {
-  //       console.log("Access token is valid. Events:", res.data.items);
-  //     } else {
-  //       console.log("Failed to validate access token. Status:", res.status);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error validating access token:", error);
-  //   }
-  // };
-
-  // const responseMessage = (token: string) => {
-  //   // try {
-  //   //   const decoded: GoogleUser = jwtDecode(token);
-  //   //   console.log("User Information:", decoded);
-  //   //   setUserProfile(decoded);
-  //   // } catch (error) {
-  //   //   console.error("Error decoding JWT:", error);
-  //   // }
-
-  //   setAccessToken(token);
-  //   // fetchEvents(token);
-
-  //   console.log("Access Token:", token);
-  //   posthog.capture("user-clicked-signin");
-
-  //   // Test the access token
-  //   testAccessToken(token);
-  // };
-
-  // //used to debounce the response message so it isn't called too many times (picture wasn't displaying)
-  // function debounce(func: Function, wait: number) {
-  //   let timeout: NodeJS.Timeout;
-  //   return function (this: any, ...args: any[]) {
-  //     clearTimeout(timeout);
-  //     timeout = setTimeout(() => func.apply(this, args), wait);
-  //   };
-  // }
-
-  // const debouncedResponseMessage = debounce(responseMessage, 300);
-
-  // const errorMessage = () => {
-  //   console.log("error!!!!!");
-  // };
-
   return (
     <Dashboard>
       <Header />
@@ -204,8 +112,6 @@ const Banner = () => {
       <div className="relative h-[350px] w-full  px-4 md:h-[605px] md:px-6 lg:px-8 xl:px-10 2xl:px-0">
         <div className="relative w-full px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-0 bg-red-200"></div>
         <div className="flex w-full flex-col items-center justify-center mt-20">
-          {/* <GoogleLogin onSuccess={responseMessage} onError={errorMessage} /> */}
-
           <button onClick={() => googleLogin()}>Sign in with Google 🚀 </button>
 
           {userProfile && (

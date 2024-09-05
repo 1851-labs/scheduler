@@ -1,12 +1,18 @@
 "use client";
 import { api } from "@/convex/_generated/api";
 import { useQuery, useMutation, useAction } from "convex/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BackgroundBeams } from "@/components/aceternity/background-beams";
 import { Dashboard } from "@/components/ui/Dashboard";
 import Header from "@/components/ui/Header";
 import ReactPixel from "react-facebook-pixel";
+
 import { GoogleLogin } from "@react-oauth/google";
+import { useGoogleLogin } from "@react-oauth/google";
+
+import { listEvents } from "@/lib/google";
+import { google } from "googleapis";
+
 import { jwtDecode } from "jwt-decode";
 import posthog from "posthog-js";
 
@@ -18,7 +24,10 @@ const Banner = () => {
   const [appDescription, setAppDescription] = useState("");
   const [results, setResults]: any[] = useState([]);
   const [promptCount, setPromptCount] = useState(0);
+
   const [userProfile, setUserProfile] = useState<any>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [events, setEvents] = useState<any[]>([]);
 
   const handleMakeIdea = async () => {
     if (!isLoading) {
@@ -39,43 +48,154 @@ const Banner = () => {
       void callBackend();
     }
   };
-  interface GoogleUser {
-    sub: string;
-    name: string;
-    given_name: string;
-    family_name: string;
-    picture: string;
-    email: string;
-  }
 
-  //TODO: could consider adding google tap on sign in
-  const responseMessage = (response: any) => {
-    try {
-      const decoded: GoogleUser = jwtDecode(response.credential);
-      console.log("User Information:", decoded);
-      setUserProfile(decoded);
-    } catch (error) {
-      console.error("Error decoding JWT:", error);
-    }
+  // const LoginButton = ({ onSuccess }: { onSuccess: (token: string) => void }) => {
+  //   const login = useGoogleLogin({
+  //     onSuccess: (tokenResponse) => {
+  //       console.log(tokenResponse.access_token);
+  //       onSuccess(tokenResponse.access_token);
+  //     },
+  //     onError: (error) => console.log(error),
+  //     scope: "https://www.googleapis.com/auth/calendar", // Scope for Calendar API
+  //   });
 
-    console.log("response", response);
-    posthog.capture("user-clicked-signin");
-  };
+  //   return <button onClick={() => login()}>Login with Google</button>;
+  // };
 
-  //used to debounce the response message so it isnt called too many times (picture wasn't displaying)
-  function debounce(func: Function, wait: number) {
-    let timeout: NodeJS.Timeout;
-    return function (this: any, ...args: any[]) {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => func.apply(this, args), wait);
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      console.log(tokenResponse);
+
+      try {
+        const response = await fetch(
+          "https://www.googleapis.com/oauth2/v3/userinfo",
+          {
+            headers: {
+              Authorization: `Bearer ${tokenResponse.access_token}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch user info");
+        }
+
+        const userInfo = await response.json();
+        console.log(userInfo);
+        setUserProfile(userInfo);
+        setAccessToken(tokenResponse.access_token);
+      } catch (error) {
+        console.error("Error fetching user info:", error);
+      }
+    },
+    onError: (errorResponse) => console.log(errorResponse),
+    scope: "https://www.googleapis.com/auth/calendar", // Scope for Calendar API
+  });
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const response = await fetch(
+          "https://www.googleapis.com/calendar/v3/calendars/primary/events",
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch events");
+        }
+
+        const data = await response.json();
+        setEvents(data.items || []);
+      } catch (error) {
+        console.error("Error fetching calendar events:", error);
+      }
     };
-  }
 
-  const debouncedResponseMessage = debounce(responseMessage, 300);
+    if (accessToken) {
+      fetchEvents();
+    }
+  }, [accessToken]);
 
-  const errorMessage = () => {
-    console.log("error!!!!!");
-  };
+  // interface GoogleUser {
+  //   sub: string;
+  //   name: string;
+  //   given_name: string;
+  //   family_name: string;
+  //   picture: string;
+  //   email: string;
+  // }
+
+  // // const fetchEvents = async (token: string) => {
+  // //   try {
+  // //     const fetchedEvents = await listEvents(token);
+  // //     setEvents(fetchedEvents);
+  // //   } catch (error) {
+  // //     console.error("Error fetching events:", error);
+  // //   }
+  // // };
+
+  // const testAccessToken = async (accessToken: string) => {
+  //   try {
+  //     const auth = new google.auth.OAuth2();
+  //     auth.setCredentials({ access_token: accessToken });
+
+  //     const calendar = google.calendar({ version: "v3", auth });
+  //     const res = await calendar.events.list({
+  //       calendarId: "primary",
+  //       timeMin: new Date().toISOString(),
+  //       maxResults: 1,
+  //       singleEvents: true,
+  //       orderBy: "startTime",
+  //     });
+
+  //     if (res.status === 200) {
+  //       console.log("Access token is valid. Events:", res.data.items);
+  //     } else {
+  //       console.log("Failed to validate access token. Status:", res.status);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error validating access token:", error);
+  //   }
+  // };
+
+  // const responseMessage = (token: string) => {
+  //   // try {
+  //   //   const decoded: GoogleUser = jwtDecode(token);
+  //   //   console.log("User Information:", decoded);
+  //   //   setUserProfile(decoded);
+  //   // } catch (error) {
+  //   //   console.error("Error decoding JWT:", error);
+  //   // }
+
+  //   setAccessToken(token);
+  //   // fetchEvents(token);
+
+  //   console.log("Access Token:", token);
+  //   posthog.capture("user-clicked-signin");
+
+  //   // Test the access token
+  //   testAccessToken(token);
+  // };
+
+  // //used to debounce the response message so it isn't called too many times (picture wasn't displaying)
+  // function debounce(func: Function, wait: number) {
+  //   let timeout: NodeJS.Timeout;
+  //   return function (this: any, ...args: any[]) {
+  //     clearTimeout(timeout);
+  //     timeout = setTimeout(() => func.apply(this, args), wait);
+  //   };
+  // }
+
+  // const debouncedResponseMessage = debounce(responseMessage, 300);
+
+  // const errorMessage = () => {
+  //   console.log("error!!!!!");
+  // };
 
   return (
     <Dashboard>
@@ -84,7 +204,10 @@ const Banner = () => {
       <div className="relative h-[350px] w-full  px-4 md:h-[605px] md:px-6 lg:px-8 xl:px-10 2xl:px-0">
         <div className="relative w-full px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-0 bg-red-200"></div>
         <div className="flex w-full flex-col items-center justify-center mt-20">
-          <GoogleLogin onSuccess={responseMessage} onError={errorMessage} />
+          {/* <GoogleLogin onSuccess={responseMessage} onError={errorMessage} /> */}
+
+          <button onClick={() => googleLogin()}>Sign in with Google 🚀 </button>
+
           {userProfile && (
             <div className="mt-4 p-4 border rounded shadow">
               <h2 className="text-2xl font-bold">User Profile</h2>
@@ -104,46 +227,23 @@ const Banner = () => {
               />
             </div>
           )}
-          {/* <h1 className=" text-center text-4xl font-medium tracking-tighter text-dark lg:text-6xl">
-            At 1851 Labs, we've come up with {numIdeas} app ideas... Hooray!
-          </h1>
-          <button
-            onClick={() => handleMakeIdea()}
-            className="mt-8 primary-gradient primary-shadow mx-auto flex max-w-xl items-center justify-center gap-3 rounded-full px-4 py-2 text-center text-sm md:px-12 md:py-4 md:text-2xl"
-          >
-            {isLoading ? (
-              <span>Loading...</span>
-            ) : (
+          <div>
+            {accessToken && (
               <>
-                <img
-                  src="/logo.svg"
-                  width="50"
-                  height="50"
-                  alt="logo"
-                  className="h-5 w-5 md:h-8 md:w-8"
-                />
-                <span>Generate app idea</span>
+                <h2>Calendar Events</h2>
+                <ul>
+                  {events.map((event) => (
+                    <li key={event.id}>
+                      {event.summary} -{" "}
+                      {event.start?.dateTime ||
+                        event.start?.date ||
+                        "No date available"}
+                    </li>
+                  ))}
+                </ul>
               </>
             )}
-          </button>
-          {appName !== "" ? (
-            <div className="m-8 p-8 primary-gradient primary-shadow">
-              <p className="text-xl font-bold">{appName}</p>
-              <p>{appDescription}</p>
-            </div>
-          ) : (
-            <></>
-          )}
-          <label style={{ display: "flex", alignItems: "center" }}>
-            Pick your favourite idea:
-            <select style={{ marginLeft: "10px", background: "transparent" }}>
-              {[...Array(promptCount)].map((_, i) => (
-                <option key={i} value={i + 1}>
-                  {i + 1}
-                </option>
-              ))}
-            </select>
-          </label> */}
+          </div>
         </div>
 
         {/* background gradient */}

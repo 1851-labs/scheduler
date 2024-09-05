@@ -1,10 +1,13 @@
-import Link from 'next/link';
+"use client";
+import Link from "next/link";
+import { SocialIcon } from "react-social-icons";
+import posthog from "posthog-js";
 
 export default function Footer() {
   return (
     <footer className="container mx-auto my-5 flex h-16 flex-col items-center justify-between space-y-3 border-t px-3 pt-4 text-center sm:h-20 sm:flex-row sm:pt-2 md:text-lg">
       <div>
-        Powered by{' '}
+        Powered by{" "}
         <a
           href="https://www.1851labs.com"
           target="_blank"
@@ -12,6 +15,43 @@ export default function Footer() {
         >
           1851 Labs
         </a>
+      </div>
+      <div className="flex items-center mt-16 space-x-8">
+        <p className="text-sm">Connect with us!</p>
+        <div className="flex flex-row space-x-3 py-4">
+          <SocialIcon
+            onClick={() => {
+              posthog.capture("clicked-social", { platform: "facebook" });
+            }}
+            style={{ height: 45, width: 45 }}
+            url="https://www.facebook.com/profile.php?id=61562199479506"
+            target="_blank"
+          />
+          <SocialIcon
+            onClick={() => {
+              posthog.capture("clicked-social", { platform: "twitter" });
+            }}
+            style={{ height: 45, width: 45 }}
+            url="https://x.com/ComicSpinApp"
+            target="_blank"
+          />
+          <SocialIcon
+            onClick={() => {
+              posthog.capture("clicked-social", { platform: "reddit" });
+            }}
+            style={{ height: 45, width: 45 }}
+            url="https://www.reddit.com/r/ComicSpin/"
+            target="_blank"
+          />
+          <SocialIcon
+            onClick={() => {
+              posthog.capture("clicked-social", { platform: "discord" });
+            }}
+            style={{ height: 45, width: 45 }}
+            url="https://discord.com/invite/CkT3R7d8G7"
+            target="_blank"
+          />
+        </div>
       </div>
       <div className="flex space-x-4 pb-4 sm:pb-0">
         <Link
@@ -30,3 +70,4 @@ export default function Footer() {
     </footer>
   );
 }
+

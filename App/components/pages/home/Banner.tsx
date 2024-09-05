@@ -10,6 +10,7 @@ import ReactPixel from "react-facebook-pixel";
 import { useGoogleLogin } from "@react-oauth/google";
 
 import posthog from "posthog-js";
+import CalendarCard from "@/components/ui/CalendarCard";
 
 const Banner = () => {
   const numIdeas = useQuery(api.ideas.getAppIdeas);
@@ -105,14 +106,31 @@ const Banner = () => {
     }
   }, [accessToken]);
 
-  return (
-    <Dashboard>
-      <Header />
+  //TODO: format to using words to represent date
+  const formatDate = (dateTime: string) => {
+    const dateObj = new Date(dateTime);
+    return dateObj.toLocaleDateString(); // Format date
+  };
 
-      <div className="relative h-[350px] w-full  px-4 md:h-[605px] md:px-6 lg:px-8 xl:px-10 2xl:px-0">
+  const formatTime = (dateTime: string) => {
+    const dateObj = new Date(dateTime);
+    return dateObj.toLocaleTimeString(); // Format time
+  };
+
+  return (
+    // <Dashboard>
+    <>
+      <Header />
+      {/* take these out for now: h-[350px]  md:h-[605px]*/}
+      <div className="relative  w-full px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-0">
         <div className="relative w-full px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-0 bg-red-200"></div>
         <div className="flex w-full flex-col items-center justify-center mt-20">
-          <button onClick={() => googleLogin()}>Sign in with Google 🚀 </button>
+          <button
+            className="bg-white text-black rounded-lg px-4 py-2 shadow-md hover:bg-gray-100 transition duration-300"
+            onClick={() => googleLogin()}
+          >
+            Sign in with Google 🚀{" "}
+          </button>
 
           {userProfile && (
             <div className="mt-4 p-4 border rounded shadow">
@@ -135,19 +153,31 @@ const Banner = () => {
           )}
           <div>
             {accessToken && (
-              <>
-                <h2>Calendar Events</h2>
-                <ul>
-                  {events.map((event) => (
-                    <li key={event.id}>
-                      {event.summary} -{" "}
-                      {event.start?.dateTime ||
-                        event.start?.date ||
-                        "No date available"}
-                    </li>
-                  ))}
+              <div className="m-4">
+                <h2 className="pb-4">Calendar Events</h2>
+                <ul className="flex-col space-y-4">
+                  {events.map((event) => {
+                    return (
+                      <li key={event.id}>
+                        <CalendarCard
+                          title={event.summary}
+                          date={
+                            event.start?.date ||
+                            formatDate(event.start?.dateTime) ||
+                            "No date available"
+                          }
+                          time={
+                            formatTime(event.start?.dateTime) ||
+                            "No time available"
+                          }
+                          location={event.location}
+                          description={event.description}
+                        />
+                      </li>
+                    );
+                  })}
                 </ul>
-              </>
+              </div>
             )}
           </div>
         </div>
@@ -159,7 +189,8 @@ const Banner = () => {
           <BackgroundGradient />
         </div> */}
       </div>
-    </Dashboard>
+    </>
+    // </Dashboard>
   );
 };
 

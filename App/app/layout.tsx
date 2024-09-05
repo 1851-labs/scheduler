@@ -11,7 +11,7 @@ import { Toaster } from "react-hot-toast";
 
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
-let title = "App Template";
+let title = "Scheduler";
 let description = "";
 let url = "https://1851labs.com";
 let sitename = "1851labs.com";

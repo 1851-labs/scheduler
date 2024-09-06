@@ -13,6 +13,8 @@ import posthog from "posthog-js";
 import CalendarCard from "@/components/ui/CalendarCard";
 import { Button } from "@/components/shadcn/Button";
 
+import Link from "next/link";
+
 const Banner = () => {
   const numIdeas = useQuery(api.ideas.getAppIdeas);
   const makeIdea = useAction(api.ideas.makeAppIdea);
@@ -113,7 +115,7 @@ const Banner = () => {
 
   const upcomingEvents = events.slice(0, 5);
 
-  //TODO: format to using words to represent date
+  //TODO: format to using words to represent date - can reference notesgpt and put in utils
   const formatDate = (dateTime: string) => {
     const dateObj = new Date(dateTime);
     return dateObj.toLocaleDateString(); // Format date
@@ -200,10 +202,17 @@ const Banner = () => {
           >
             Sign in with Google 🚀{" "}
           </button>
-          <div className="m-4">
+          <div className="mt-4">
             <Button onClick={createEvent} disabled={!accessToken}>
               Create Event
             </Button>
+          </div>
+          <div className="mt-4">
+            <Link href="/record">
+              <Button size="sm" variant="secondary">
+                Record
+              </Button>
+            </Link>
           </div>
           {userProfile && (
             <div className="mt-4 p-4 border border-card rounded shadow">

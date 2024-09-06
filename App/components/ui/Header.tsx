@@ -25,7 +25,7 @@ const Header = () => {
             Scheduler
           </h1>
         </Link>
-        <Link href="/cid">cid Tracker</Link>
+        <Link href="/record">Record</Link>
         <Link href="/component-library">View UI Examples</Link>
         {/* buttons */}
         {/* login / user menu */}

@@ -15,6 +15,7 @@ import type {
   FunctionReference,
 } from "convex/server";
 import type * as aws from "../aws.js";
+import type * as events from "../events.js";
 import type * as feedback from "../feedback.js";
 import type * as ideas from "../ideas.js";
 import type * as openai_dalle from "../openai/dalle.js";
@@ -37,6 +38,7 @@ import type * as utils from "../utils.js";
  */
 declare const fullApi: ApiFromModules<{
   aws: typeof aws;
+  events: typeof events;
   feedback: typeof feedback;
   ideas: typeof ideas;
   "openai/dalle": typeof openai_dalle;

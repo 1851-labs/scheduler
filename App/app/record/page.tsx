@@ -14,12 +14,6 @@ export default function RecordVoicePage() {
   const [totalSeconds, setTotalSeconds] = useState(0);
 
   const [transcript, setTranscript] = useState<string | null>(null);
-  const [eventDetails, setEventDetails] = useState<{
-    name: string;
-    date: string;
-    time: string;
-    description: string;
-  } | null>(null);
 
   const processedTranscript = useAction(api.events.processTranscript);
   const generatedUploadUrl = useMutation(api.events.generateUploadUrl);

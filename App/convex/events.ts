@@ -30,24 +30,10 @@ export const transcribeAudio = action({
     return transcript;
   },
 });
-// export const transcribeAudio = action({
-//   args: {
-//     fileUrl: v.string(), // URL of the audio file
-//     // id: v.id("events"), // Event ID for tracking purposes
-//   },
-//   handler: async (ctx: any, args: any): Promise<TranscriptionResult> => {
-//     const transcript = await ctx.runAction(
-//       internal.replicate.whisper.getTranscription,
-//       { fileUrl: args.fileUrl }
-//       // { fileUrl: args.fileUrl, id: args.id }
-//     );
-//     return { transcript };
-//   },
-// });
 
 export const processTranscript = action({
   args: {
-    transcript: v.string(), // The full transcript text
+    transcript: v.string(),
   },
   handler: async (ctx, args) => {
     try {
@@ -56,7 +42,9 @@ export const processTranscript = action({
       return {
         name: eventDetails.name,
         date: eventDetails.date,
-        time: eventDetails.time,
+        location: eventDetails.location,
+        startTime: eventDetails.startTime,
+        endTime: eventDetails.endTime,
         description: eventDetails.description,
       };
     } catch (error) {

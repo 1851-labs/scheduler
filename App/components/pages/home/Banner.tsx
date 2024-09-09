@@ -1,10 +1,9 @@
 "use client";
 import { api } from "@/convex/_generated/api";
-import { useQuery, useMutation, useAction } from "convex/react";
+import { useMutation, useAction } from "convex/react";
 import { useState, useEffect } from "react";
-import { BackgroundBeams } from "@/components/aceternity/background-beams";
 import Header from "@/components/ui/Header";
-import ReactPixel from "react-facebook-pixel";
+import { parseISO, parse, format } from "date-fns";
 
 import { useGoogleLogin } from "@react-oauth/google";
 
@@ -12,19 +11,10 @@ import posthog from "posthog-js";
 import CalendarCard from "@/components/ui/CalendarCard";
 import { Button } from "@/components/shadcn/Button";
 
-import Link from "next/link";
-
 import { Mic } from "react-feather";
-import { start } from "repl";
 
 const Banner = () => {
-  const numIdeas = useQuery(api.ideas.getAppIdeas);
-  const makeIdea = useAction(api.ideas.makeAppIdea);
   const [isLoading, setIsLoading] = useState(false);
-  const [appName, setAppName] = useState("");
-  const [appDescription, setAppDescription] = useState("");
-  const [results, setResults]: any[] = useState([]);
-  const [promptCount, setPromptCount] = useState(0);
 
   const [userProfile, setUserProfile] = useState<any>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
@@ -74,7 +64,6 @@ const Banner = () => {
       try {
         const now = new Date();
         const today = now.toISOString();
-        console.log(now, "  ", today);
 
         const response = await fetch(
           `https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${today}&orderBy=startTime&singleEvents=true`,
@@ -104,15 +93,46 @@ const Banner = () => {
 
   const upcomingEvents = events.slice(0, 5);
 
-  //TODO: format to using words to represent date - can reference notesgpt and put in utils
+  const getUserTimezone = async (accessToken: string) => {
+    try {
+      const response = await fetch(
+        "https://www.googleapis.com/calendar/v3/users/me/settings/timezone",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch timezone: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data.value; // This is the user's timezone, e.g., 'America/Los_Angeles'
+    } catch (error) {
+      console.error("Error fetching user timezone:", error);
+      throw error;
+    }
+  };
+
   const formatDate = (dateTime: string) => {
-    const dateObj = new Date(dateTime);
-    return dateObj.toLocaleDateString(); // Format date
+    const date = parseISO(dateTime);
+    return format(date, "dd MMM yyyy");
+  };
+
+  const parseDate = (date?: string) => {
+    if (!date) {
+      return;
+    }
+    const parsedDate = parse(date, "yyyy-MM-dd", new Date());
+    return format(parsedDate, "dd MMM yyyy");
   };
 
   const formatTime = (dateTime: string) => {
-    const dateObj = new Date(dateTime);
-    return dateObj.toLocaleTimeString(); // Format time
+    const date = parseISO(dateTime);
+    return format(date, "hh:mm a");
   };
 
   const createEvent = async () => {
@@ -120,33 +140,33 @@ const Banner = () => {
       console.error("Access token is missing. Please log in first.");
       return;
     }
+
     try {
       const result = await handleExtractTranscript();
+      const userTimezone = await getUserTimezone(accessToken);
+
       if (result) {
-        const { date, time, description, name } = result;
+        const { name, date, location, startTime, endTime, description } =
+          result;
 
-        console.log(
-          "date",
-          new Date(new Date(date).getTime() + 60 * 60 * 1000).toISOString()
-        );
-        console.log(new Date(`${date} ${time}`).toISOString());
-
-        const startDateTime = new Date(`${date} ${time}`).toISOString(); // Convert to ISO format
-        const endDateTime = new Date(
-          new Date(date).getTime() + 60 * 60 * 1000
-        ).toISOString();
+        const startDateTime = `${date}T${startTime}`;
+        const endDateTime = `${date}T${endTime}`;
 
         const event = {
           summary: name,
-          location: "", // TODO: add location if available
+          location: location,
           description: description,
-          start: {
-            dateTime: endDateTime,
-            timeZone: "UTC", // TODO: Adjust timezone
-          },
+          start: startDateTime
+            ? {
+                dateTime: startDateTime,
+                timeZone: userTimezone,
+              }
+            : {
+                date: date,
+              },
           end: {
-            dateTime: startDateTime,
-            timeZone: "UTC",
+            dateTime: endDateTime,
+            timeZone: userTimezone,
           },
           reminders: {
             useDefault: false,
@@ -262,7 +282,9 @@ const Banner = () => {
       console.log("Processed Transcript Result:", result);
       return {
         date: result.date,
-        time: result.time,
+        location: result.location,
+        startTime: result.startTime,
+        endTime: result.endTime,
         description: result.description,
         name: result.name,
       };
@@ -275,147 +297,120 @@ const Banner = () => {
     <>
       <Header />
       <div className="relative min-h-[350px] md:min-h-[605px] w-full px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-0">
-        <div className="relative w-full px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-0 bg-red-200"></div>
-        <div className="flex w-full flex-col items-center justify-center mt-20">
-          <button
-            className="bg-white text-black rounded-lg px-4 py-2 shadow-md hover:bg-gray-100 transition duration-300"
-            onClick={() => googleLogin()}
-          >
-            Sign in with Google 🚀{" "}
-          </button>
-          <div className="mt-4">
-            <Button onClick={createEvent} disabled={!accessToken}>
-              Create Event
-            </Button>
-          </div>
-          {/* <div className="mt-4">
-            <Link href="/record">
-              <Button size="sm" variant="secondary">
-                Record
-              </Button>
-            </Link>
-          </div> */}
-          <div className=" flex flex-col items-center justify-between">
-            <h1 className="pt-[25px] text-center text-xl font-medium text-dark md:pt-[47px] md:text-4xl">
-              {title}
-            </h1>
-            <div className="relative mx-auto my-16 items-center justify-center">
-              <div className="z-50 flex h-fit w-fit flex-col items-center justify-center">
-                <h2 className="text-[30px] tracking-[-1.0px]">
-                  {formatRecordingTime(Math.floor(totalSeconds / 60))}:
-                  {formatRecordingTime(totalSeconds % 60)}
-                </h2>
-              </div>
-              <div className="mt-2 flex w-fit items-center justify-center gap-[33px] pb-7 md:gap-[77px] ">
-                <button
-                  onClick={handleRecordClick}
-                  className="relative inline-flex h-20 w-20 items-center justify-center rounded-full bg-gradient-radial from-white to-secondary shadow-xl transition-transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-                >
-                  <div className="absolute h-16 w-16 rounded-full bg-secondary flex items-center justify-center">
-                    {!isRunning ? (
-                      <Mic className="h-8 w-8 text-white" />
-                    ) : (
-                      <Mic className="h-8 w-8 text-white animate-pulse transition" />
-                    )}
-                  </div>
-                </button>
-              </div>
-            </div>
+        <div className="w-full md:flex justify-center">
+          <div className="flex items-start">
+            <div className="flex w-full flex-col items-center justify-center mt-20">
+              <button
+                className="bg-white text-black rounded-lg px-4 py-2 shadow-md hover:bg-gray-100 transition duration-300"
+                onClick={() => googleLogin()}
+              >
+                Sign in with Google 🚀{" "}
+              </button>
 
-            <div>
-              {transcript && (
-                <div>
-                  <h2>Transcript:</h2>
-                  <p>{transcript}</p>
+              <div className=" flex flex-col items-center justify-between">
+                <h1 className="pt-24 text-center text-xl font-medium text-dark md:pt-[47px] md:text-4xl">
+                  {title}
+                </h1>
+                <div className="relative mx-auto mt-16 items-center justify-center">
+                  <div className="z-50 flex h-fit w-fit flex-col items-center justify-center">
+                    <h2 className="text-[30px] tracking-[-1.0px]">
+                      {formatRecordingTime(Math.floor(totalSeconds / 60))}:
+                      {formatRecordingTime(totalSeconds % 60)}
+                    </h2>
+                  </div>
+                  <div className="mt-2 flex w-fit items-center justify-center gap-[33px] pb-7 md:gap-[77px] ">
+                    <button
+                      onClick={handleRecordClick}
+                      className="relative inline-flex h-20 w-20 items-center justify-center rounded-full bg-gradient-radial from-white to-secondary shadow-xl transition-transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                    >
+                      <div className="absolute h-16 w-16 rounded-full bg-secondary flex items-center justify-center">
+                        {!isRunning ? (
+                          <Mic className="h-8 w-8 text-white" />
+                        ) : (
+                          <Mic className="h-8 w-8 text-white animate-pulse transition" />
+                        )}
+                      </div>
+                    </button>
+                  </div>
+                </div>
+                <div className="my-4">
+                  {transcript && (
+                    <div>
+                      <h2>Transcript:</h2>
+                      <p>{transcript}</p>
+                    </div>
+                  )}
+                </div>
+                <div className="p-2">
+                  <Button onClick={createEvent} disabled={!accessToken}>
+                    Create Event 😎
+                  </Button>
+                </div>
+              </div>
+              {userProfile && (
+                <div className="mt-4 p-4 border border-card rounded shadow">
+                  <h2 className="text-2xl font-bold">User Profile</h2>
+                  <p>
+                    <strong>ID:</strong> {userProfile.sub}
+                  </p>
+                  <p>
+                    <strong>Name:</strong> {userProfile.name}
+                  </p>
+                  <p>
+                    <strong>Email:</strong> {userProfile.email}
+                  </p>
+                  <img
+                    src={userProfile.picture}
+                    alt="Profile Image"
+                    className="rounded-full h-6 w-6"
+                  />
                 </div>
               )}
             </div>
+            <div className="flex w-full justify-center">
+              {accessToken && (
+                <div className="m-4 w-[450px]">
+                  <h2 className="pb-4">Upcoming Events</h2>
+                  <ul className="flex-col space-y-4">
+                    {upcomingEvents.map((event) => {
+                      // Log  details of each event - temporary for debugging
+                      // console.log("Event Details:", {
+                      //   event,
+                      // });
+                      if (!event.summary) {
+                        return null; // Skip rendering this event
+                      }
 
-            <Button onClick={handleExtractTranscript}>extract me 😎</Button>
-          </div>
-          {userProfile && (
-            <div className="mt-4 p-4 border border-card rounded shadow">
-              <h2 className="text-2xl font-bold">User Profile</h2>
-              <p>
-                <strong>ID:</strong> {userProfile.sub}
-              </p>
-              <p>
-                <strong>Name:</strong> {userProfile.name}
-              </p>
-              <p>
-                <strong>Email:</strong> {userProfile.email}
-              </p>
-              <img
-                src={userProfile.picture}
-                alt="Profile Image"
-                className="rounded-full h-6 w-6"
-              />
+                      const time = event.start?.dateTime
+                        ? formatTime(event.start.dateTime)
+                        : "All Day Event";
+
+                      return (
+                        <li key={event.id}>
+                          <CalendarCard
+                            title={event.summary}
+                            date={
+                              parseDate(event.start?.date) ||
+                              formatDate(event.start?.dateTime) ||
+                              "No date available"
+                            }
+                            time={time}
+                            location={event.location}
+                            description={event.description}
+                          />
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              )}
             </div>
-          )}
-          <div>
-            {accessToken && (
-              <div className="m-4">
-                <h2 className="pb-4">Upcoming Events</h2>
-                <ul className="flex-col space-y-4">
-                  {upcomingEvents.map((event) => {
-                    // Log  details of each event - temporary for debugging
-                    // console.log("Event Details:", {
-                    //   event,
-                    // });
-                    if (!event.summary) {
-                      return null; // Skip rendering this event
-                    }
-
-                    return (
-                      <li key={event.id}>
-                        <CalendarCard
-                          title={event.summary}
-                          date={
-                            event.start?.date ||
-                            formatDate(event.start?.dateTime) ||
-                            "No date available"
-                          }
-                          time={
-                            formatTime(event.start?.dateTime) ||
-                            "No time available"
-                          }
-                          location={event.location}
-                          description={event.description}
-                        />
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            )}
           </div>
         </div>
-
-        {/* background gradient */}
-        {/* <div className="absolute bottom-0 left-0 right-0 top-0 z-[-1] hidden h-full w-full grid-cols-3 md:grid">
-          <BackgroundGradient />
-          <BackgroundGradient />
-          <BackgroundGradient />
-        </div> */}
       </div>
     </>
-    // </Dashboard>
   );
 };
-
-function BackgroundGradient() {
-  return (
-    <div
-      className="h-full w-full rounded-full"
-      style={{
-        opacity: "0.9",
-        background:
-          "radial-gradient(54.14% 54.14% at 50% 50%, #D9D7F1 35%, rgba(517, 415, 241, 0.86) 100%)",
-        filter: "blur(150px)",
-      }}
-    />
-  );
-}
 
 export default Banner;
 

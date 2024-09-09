@@ -20,7 +20,7 @@ const Banner = () => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [events, setEvents] = useState<any[]>([]);
 
-  const [title, setTitle] = useState("Record!");
+  const [title, setTitle] = useState("Press to Record");
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
   const [totalSeconds, setTotalSeconds] = useState(0);
@@ -273,7 +273,7 @@ const Banner = () => {
   }
 
   const handleRecordClick = async () => {
-    if (title === "Record!") {
+    if (title === "Press to Record") {
       setTitle("Recording...");
       startRecording();
     } else if (title === "Recording...") {
@@ -321,33 +321,48 @@ const Banner = () => {
                   Log out
                 </button>
               ) : (
-                <button
-                  className="bg-white text-black rounded-lg px-4 py-2 shadow-md hover:bg-gray-100 transition duration-300"
-                  onClick={() => googleLogin()}
-                >
-                  Sign in with Google 🚀{" "}
-                </button>
+                <div className="flex-col justify-center max-w-[300px] mb-4">
+                  <div className="flex justify-center">
+                    <h1 className="font-semibold text-5xl">VoCal</h1>
+                  </div>
+                  <div className="flex justify-center my-2 max-w-[250px]">
+                    <p className="text-center">
+                      Record your voice and create events in your calendar!
+                    </p>
+                  </div>
+                  <div className="flex justify-center mt-2">
+                    <button
+                      className="bg-white text-black rounded-lg px-4 py-2 shadow-md hover:bg-gray-100 transition duration-300"
+                      onClick={() => googleLogin()}
+                    >
+                      Sign in with Google 🚀{" "}
+                    </button>
+                  </div>
+                </div>
               )}
 
-              <div className=" flex flex-col items-center justify-between">
-                <h1 className="pt-8 text-center text-xl font-medium text-dark md:pt-12 md:text-4xl">
-                  {title}
-                </h1>
-                <div className="relative mx-auto mt-16 items-center justify-center">
-                  <div className="z-50 flex h-fit w-fit flex-col items-center justify-center">
-                    <h2 className="text-[30px] tracking-[-1.0px]">
-                      {formatRecordingTime(Math.floor(totalSeconds / 60))}:
-                      {formatRecordingTime(totalSeconds % 60)}
-                    </h2>
+              <div className="flex flex-col items-center justify-between mt-4">
+                <div className="flex items-center justify-center">
+                  <p className="text-foreground/80">{title}</p>
+                </div>
+
+                <div className="relative mx-auto items-center justify-center">
+                  <div className="flex items-center justify-center">
+                    <div className="flex-col items-center justify-center">
+                      <h2 className="text-2xl text-foreground/50">
+                        {formatRecordingTime(Math.floor(totalSeconds / 60))}:
+                        {formatRecordingTime(totalSeconds % 60)}
+                      </h2>
+                    </div>
                   </div>
-                  <div className="mt-2 flex w-fit items-center justify-center gap-[33px] pb-7 md:gap-[77px] ">
+                  <div className="mt-2 flex w-fit items-center justify-center gap-[33px] pb-2 md:gap-[77px] ">
                     <button
                       onClick={handleRecordClick}
-                      className="relative inline-flex h-20 w-20 items-center justify-center rounded-full bg-gradient-radial from-white to-secondary shadow-xl transition-transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                      className="relative inline-flex h-24 w-24 items-center justify-center rounded-full bg-gradient-radial from-white to-secondary shadow-xl transition-transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                     >
-                      <div className="absolute h-16 w-16 rounded-full bg-secondary flex items-center justify-center">
+                      <div className="absolute h-20 w-20 rounded-full bg-secondary flex items-center justify-center">
                         {!isRunning ? (
-                          <Mic className="h-8 w-8 text-white" />
+                          <Mic className="h-12 w-12 text-white" />
                         ) : (
                           <Mic className="h-8 w-8 text-white animate-pulse transition" />
                         )}
@@ -434,6 +449,16 @@ const Banner = () => {
               </div>
             )}
           </div>
+        </div>
+        <div>
+          {userProfile && (
+            <button
+              className="bg-white text-black rounded-lg px-4 py-2 shadow-md hover:bg-gray-100 transition duration-300"
+              onClick={() => logOut()}
+            >
+              Log out
+            </button>
+          )}
         </div>
       </div>
     </>

@@ -16,17 +16,9 @@ const Header = () => {
   return (
     <div className="z-10 container relative m-0 mx-auto py-10 md:px-10">
       <div className="flex items-left ml-2 justify-between">
-        {/* logo */}
         <Link className="flex w-fit items-center gap-[2px]" href="/">
-          <img
-            src="/logo.svg"
-            width={50}
-            height={50}
-            alt="logo"
-            className="h-5 w-5 md:h-8 md:w-8"
-          />
           <h1 className="text-xl font-medium text-[#25292F] md:text-3xl">
-            Scheduler
+            VoCal
           </h1>
         </Link>
         <Link href="/" onClick={handleRefresh}>

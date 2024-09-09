@@ -23,7 +23,6 @@ const WHISPER: `${string}/${string}:${string}` =
 export const getTranscription = internalAction({
   args: {
     fileUrl: v.string(),
-    // id: v.id("events"),
   },
   handler: async (ctx, args) => {
     try {
@@ -45,7 +44,6 @@ export const getTranscription = internalAction({
 
       const transcript = replicateOutput.transcription || "error";
 
-      // return transcript;
       return { transcript };
     } catch (error) {
       return {

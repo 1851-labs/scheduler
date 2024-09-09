@@ -53,9 +53,6 @@ const Banner = () => {
         setUserProfile(userInfo);
         setAccessToken(tokenResponse.access_token);
         posthog.capture("user-clicked-signin");
-        setTranscript(
-          "I have an event to review pull requests with the team at Thursday, September 12th at 9pm and we're going to be making sure everything is right and going through co-review."
-        );
       } catch (error) {
         console.error("Error fetching user info:", error);
       }

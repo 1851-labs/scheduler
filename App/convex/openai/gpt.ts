@@ -301,10 +301,10 @@ const transcriptSchema = z.object({
   description: z.string(),
 });
 const TRANSCRIPT_SYS_PROMPT: PromptTemplate = PromptTemplate.fromTemplate(
-  `You're an expert in natural language processing and information extraction. Your task is to extract specific details from a given text. Be specific in your answers and use common sense. Answer in valid JSON format.`
+  `You're an expert in natural language processing and information extraction. Your task is to extract specific details from a given text. Ensure that time is formatted in ISO 8601 format, e.g., "2024-09-11T09:00:00-07:00". If the year is not specified in the transcript, assume it is 2024. Be specific in your answers and use common sense. Answer in valid JSON format.`
 );
 const TRANSCRIPT_USER_PROMPT: PromptTemplate = PromptTemplate.fromTemplate(
-  `Extract the event details from the following transcript. The details should include the event date and time. Generate an appropriate event name and description based on the provided context. Ensure all fields are present and valid, even if you need to make educated guesses. The response should strictly be in valid JSON format."
+  `Extract the event details from the following transcript. The details should include the date and time of the event. Ensure that time is in ISO 8601 format, e.g., "2024-09-11T09:00:00-07:00". If the year is not specified in the transcript, assume it is 2024. Generate an appropriate event name and description based on the provided context. Ensure all fields are present and valid, even if you need to make educated guesses. The response should strictly be in valid JSON format."
   
 Transcript:
 "{transcript}"`

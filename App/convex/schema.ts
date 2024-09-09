@@ -5,6 +5,10 @@ import test from "node:test";
 // Documentation: https://docs.convex.dev/database/schemas
 
 export default defineSchema({
+  // audioFiles: defineTable({
+  //   id: v.string(),
+  //   url: v.string(),
+  // }),
   appIdeas: defineTable({
     name: v.string(),
     description: v.string(),

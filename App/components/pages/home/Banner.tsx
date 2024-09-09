@@ -3,7 +3,6 @@ import { api } from "@/convex/_generated/api";
 import { useQuery, useMutation, useAction } from "convex/react";
 import { useState, useEffect } from "react";
 import { BackgroundBeams } from "@/components/aceternity/background-beams";
-import { Dashboard } from "@/components/ui/Dashboard";
 import Header from "@/components/ui/Header";
 import ReactPixel from "react-facebook-pixel";
 
@@ -134,21 +133,16 @@ const Banner = () => {
 
     // Define the event details
     const event = {
-      summary: "Sample Event 2",
+      summary: "Sample Event 3",
       location: "221B Baker Street, London, UK",
       description: "This is an event created via Google Calendar API.",
       start: {
-        dateTime: "2024-09-08T09:00:00-07:00",
-        timeZone: "America/Los_Angeles",
+        dateTime: "2024-09-11T09:00:00-07:00",
       },
       end: {
-        dateTime: "2024-09-08T10:00:00-07:00",
+        dateTime: "2024-09-11T10:00:00-07:00",
         timeZone: "America/Los_Angeles",
       },
-      attendees: [
-        { email: "attendee1@example.com" },
-        { email: "attendee2@example.com" },
-      ],
       reminders: {
         useDefault: false,
         overrides: [

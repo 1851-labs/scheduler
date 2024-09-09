@@ -1,22 +1,18 @@
 "use client";
 import Header from "@/components/ui/Header";
 import { useEffect, useState } from "react";
-import { Mic, AlertTriangle } from "react-feather";
-import { set } from "zod";
+import { Mic } from "react-feather";
 import { Button } from "@/components/shadcn/Button";
 
-import { useAction } from "convex/react";
+import { useAction, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { extractTranscript } from "@/convex/openai/gpt";
-import { processTranscript } from "@/convex/events";
 
 export default function RecordVoicePage() {
-  const [title, setTitle] = useState("Record your voice note");
+  const [title, setTitle] = useState("Record!");
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
   const [totalSeconds, setTotalSeconds] = useState(0);
 
-  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [transcript, setTranscript] = useState<string | null>(null);
   const [eventDetails, setEventDetails] = useState<{
     name: string;
@@ -24,7 +20,10 @@ export default function RecordVoicePage() {
     time: string;
     description: string;
   } | null>(null);
+
   const processedTranscript = useAction(api.events.processTranscript);
+  const generatedUploadUrl = useMutation(api.events.generateUploadUrl);
+  const transcribe = useAction(api.events.transcribeAudio);
 
   async function startRecording() {
     setIsRunning(true);
@@ -36,16 +35,23 @@ export default function RecordVoicePage() {
       audioChunks.push(e.data);
     };
 
-    recorder.onstop = () => {
+    recorder.onstop = async () => {
       const audioBlob = new Blob(audioChunks, { type: "audio/mp3" });
-      setAudioBlob(audioBlob);
-      // You can now use the audioBlob for transcription or other purposes
-      console.log("Recording stopped, audioBlob:", audioBlob);
 
-      const audioUrl = URL.createObjectURL(audioBlob);
-      handleTranscription(audioUrl);
+      const postUrl = await generatedUploadUrl();
+
+      const result = await fetch(postUrl, {
+        method: "POST",
+        headers: { "Content-Type": "audio/mp3" },
+        body: audioBlob,
+      });
+
+      const { storageId } = await result.json();
+
+      const transcription = await transcribe({ storageId });
+      console.log(transcription.transcript);
+      setTranscript(transcription.transcript);
     };
-
     setMediaRecorder(recorder as any);
     recorder.start();
   }
@@ -73,7 +79,7 @@ export default function RecordVoicePage() {
   }
 
   const handleRecordClick = async () => {
-    if (title === "Record your voice note") {
+    if (title === "Record!") {
       setTitle("Recording...");
       startRecording();
     } else if (title === "Recording...") {
@@ -82,33 +88,11 @@ export default function RecordVoicePage() {
     }
   };
 
-  const processTranscription = async () => {
-    console.log("Processing transcription...");
-    try {
-      await handleTranscription("https://www.meganwu.me/test.mp3");
-      // https://replicate.delivery/mgxm/e5159b1b-508a-4be4-b892-e1eb47850bdc/OSR_uk_000_0050_8k.wav
-    } catch (error) {
-      console.error("Error during processTranscription", error);
-    }
-  };
-
-  const transcribe = useAction(api.events.transcribeAudio);
-
-  const handleTranscription = async (audioUrl: any) => {
-    const transcription = await transcribe({
-      fileUrl: audioUrl,
-    });
-    console.log("audio url", audioUrl);
-    console.log("Transcription:", transcription);
-
-    setTranscript(JSON.stringify(transcription.transcript));
-  };
-
   const handleExtractTranscript = async () => {
-    const inputTranscript =
-      "I have a standup at 9am on tuesday, September 10th to sort out the week's todos and recap.";
     try {
-      const result = await processedTranscript({ transcript: inputTranscript });
+      const result = await processedTranscript({
+        transcript: transcript ?? "",
+      });
       console.log("Processed Transcript Result:", result);
     } catch (error) {
       console.error("Error processing transcript:", error);
@@ -122,52 +106,30 @@ export default function RecordVoicePage() {
         <h1 className="pt-[25px] text-center text-xl font-medium text-dark md:pt-[47px] md:text-4xl">
           {title}
         </h1>
-        <p className="mb-20 mt-4 text-gray-400">imagine this is today's date</p>
-        <div className="relative mx-auto flex h-[316px] w-[316px] items-center justify-center">
-          <div
-            className={`recording-box absolute h-full w-full rounded-[50%] p-[12%] pt-[17%] ${
-              title !== "Record your voice note" && title !== "Processing..."
-                ? "record-animation"
-                : ""
-            }`}
-          >
-            <div
-              className="h-full w-full rounded-[50%]"
-              style={{ background: "linear-gradient(#E31C1CD6, #003EB6CC)" }}
-            />
-          </div>
+        <div className="relative mx-auto my-16 items-center justify-center">
           <div className="z-50 flex h-fit w-fit flex-col items-center justify-center">
-            <h1 className="text-[60px] leading-[114.3%] tracking-[-1.5px] text-light">
+            <h2 className="text-[30px] tracking-[-1.0px]">
               {formatTime(Math.floor(totalSeconds / 60))}:
               {formatTime(totalSeconds % 60)}
-            </h1>
+            </h2>
+          </div>
+          <div className="mt-2 flex w-fit items-center justify-center gap-[33px] pb-7 md:gap-[77px] ">
+            <button
+              onClick={handleRecordClick}
+              className="relative inline-flex h-20 w-20 items-center justify-center rounded-full bg-gradient-radial from-white to-secondary shadow-xl transition-transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            >
+              <div className="absolute h-16 w-16 rounded-full bg-secondary flex items-center justify-center">
+                {!isRunning ? (
+                  <Mic className="h-8 w-8 text-white" />
+                ) : (
+                  <Mic className="h-8 w-8 text-white animate-pulse transition" />
+                )}
+              </div>
+            </button>
           </div>
         </div>
-        <div className="mt-10 flex w-fit items-center justify-center gap-[33px] pb-7 md:gap-[77px] ">
-          <button
-            onClick={handleRecordClick}
-            className="mt-10 h-fit w-fit rounded-[50%] border-[2px]"
-            style={{ boxShadow: "0px 0px 8px 5px rgba(0,0,0,0.3)" }}
-          >
-            {!isRunning ? (
-              <Mic
-                width={148}
-                height={148}
-                className="h-[70px] w-[70px] md:h-[100px] md:w-[100px]"
-              />
-            ) : (
-              <Mic
-                width={148}
-                height={148}
-                className="h-[70px] w-[70px] animate-pulse transition md:h-[100px] md:w-[100px]"
-              />
-            )}
-          </button>
-          {/* )} */}
-        </div>
-        <Button onClick={handleExtractTranscript}>Extract Transcript</Button>
+
         <div>
-          <button onClick={processTranscription}>Process Transcription</button>
           {transcript && (
             <div>
               <h2>Transcript:</h2>
@@ -176,14 +138,16 @@ export default function RecordVoicePage() {
           )}
         </div>
 
-        {audioBlob && (
+        <Button onClick={handleExtractTranscript}>Looks good!</Button>
+
+        {/* {audioBlob && (
           <div className="mt-10">
             <h2 className="text-center text-xl font-medium text-dark">
               Playback
             </h2>
             <audio controls src={URL.createObjectURL(audioBlob)} />
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );

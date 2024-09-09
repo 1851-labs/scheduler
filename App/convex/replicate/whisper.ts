@@ -5,7 +5,7 @@ import { internalAction } from "../_generated/server";
 import { v } from "convex/values";
 
 const replicate = new Replicate({
-  auth: "r8_Xzz2EbUk8RiMCwQG85ae0pA7Vtoi8RH15yaTx",
+  auth: process.env.REPLICATE_API_TOKEN,
 });
 
 interface whisperOutput {
@@ -44,8 +44,9 @@ export const getTranscription = internalAction({
       })) as whisperOutput;
 
       const transcript = replicateOutput.transcription || "error";
-      return transcript;
-      // return { transcript };
+
+      // return transcript;
+      return { transcript };
     } catch (error) {
       return {
         transcript: "Error occurred duringggg transcription",

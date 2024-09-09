@@ -9,6 +9,10 @@ const Header = () => {
   const { isLoading } = useConvexAuth();
   const { user } = useUser();
 
+  const handleRefresh = (e: any) => {
+    e.preventDefault();
+    window.location.href = "/";
+  };
   return (
     <div className="z-10 container relative m-0 mx-auto py-10 md:px-10">
       <div className="flex items-left ml-2 justify-between">
@@ -25,7 +29,9 @@ const Header = () => {
             Scheduler
           </h1>
         </Link>
-        <Link href="/record">Record</Link>
+        <Link href="/" onClick={handleRefresh}>
+          Home
+        </Link>
         {/* <Link href="/component-library">View UI Examples</Link> */}
         {/* buttons */}
         {/* login / user menu */}

@@ -27,6 +27,8 @@ const Banner = () => {
 
   const [transcript, setTranscript] = useState<string | null>(null);
 
+  const [slideIn, setSlideIn] = useState(false);
+
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       console.log(tokenResponse);
@@ -292,13 +294,18 @@ const Banner = () => {
       console.error("Error processing transcript:", error);
     }
   };
+  useEffect(() => {
+    if (accessToken) {
+      setSlideIn(true);
+    }
+  }, [accessToken]);
 
   return (
     <>
       <Header />
       <div className="relative min-h-[350px] md:min-h-[605px] w-full px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-0">
-        <div className="w-full md:flex justify-center">
-          <div className="flex items-start">
+        <div className="w-full flex items-center justify-center">
+          <div className="flex items-center md:items-start gap-4">
             <div className="flex w-full flex-col items-center justify-center mt-20">
               <button
                 className="bg-white text-black rounded-lg px-4 py-2 shadow-md hover:bg-gray-100 transition duration-300"
@@ -367,16 +374,18 @@ const Banner = () => {
                 </div>
               )}
             </div>
-            <div className="flex w-full justify-center">
-              {accessToken && (
+
+            {accessToken && (
+              <div
+                className={`flex w-full justify-center transform transition-transform duration-1000 ${
+                  slideIn ? "translate-x-0" : "translate-x-full"
+                }`}
+              >
                 <div className="m-4 w-[450px]">
-                  <h2 className="pb-4">Upcoming Events</h2>
+                  {upcomingEvents && <h2 className="pb-4">Upcoming Events</h2>}
+
                   <ul className="flex-col space-y-4">
                     {upcomingEvents.map((event) => {
-                      // Log  details of each event - temporary for debugging
-                      // console.log("Event Details:", {
-                      //   event,
-                      // });
                       if (!event.summary) {
                         return null; // Skip rendering this event
                       }
@@ -386,6 +395,7 @@ const Banner = () => {
                         : "All Day Event";
 
                       return (
+                        //TODO: link each card to its calendar event
                         <li key={event.id}>
                           <CalendarCard
                             title={event.summary}
@@ -403,8 +413,8 @@ const Banner = () => {
                     })}
                   </ul>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

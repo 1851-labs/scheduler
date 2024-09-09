@@ -6,7 +6,7 @@ import posthog from "posthog-js";
 export default function Footer() {
   return (
     <footer className="container mx-auto my-5 flex h-16 flex-col items-center justify-between space-y-3 border-t px-3 pt-4 text-center sm:h-20 sm:flex-row sm:pt-2 md:text-lg">
-      <div>
+      <div className="flex items-center justify-center">
         Powered by{" "}
         <a
           href="https://www.1851labs.com"
@@ -16,7 +16,7 @@ export default function Footer() {
           1851 Labs
         </a>
       </div>
-      <div className="flex items-center mt-16 space-x-8">
+      <div className="flex items-center space-x-8">
         <p className="text-sm">Connect with us!</p>
         <div className="flex flex-row space-x-3 py-4">
           <SocialIcon

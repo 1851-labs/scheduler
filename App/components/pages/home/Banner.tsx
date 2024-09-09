@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import Header from "@/components/ui/Header";
 import { parseISO, parse, format } from "date-fns";
 
-import { useGoogleLogin } from "@react-oauth/google";
+import { useGoogleLogin, googleLogout } from "@react-oauth/google";
 
 import posthog from "posthog-js";
 import CalendarCard from "@/components/ui/CalendarCard";
@@ -53,6 +53,9 @@ const Banner = () => {
         setUserProfile(userInfo);
         setAccessToken(tokenResponse.access_token);
         posthog.capture("user-clicked-signin");
+        setTranscript(
+          "I have an event to review pull requests with the team at Thursday, September 12th at 9pm and we're going to be making sure everything is right and going through co-review."
+        );
       } catch (error) {
         console.error("Error fetching user info:", error);
       }
@@ -60,6 +63,12 @@ const Banner = () => {
     onError: (errorResponse) => console.log(errorResponse),
     scope: "https://www.googleapis.com/auth/calendar", // Scope for Calendar API
   });
+
+  const logOut = () => {
+    googleLogout();
+    window.location.reload();
+    setUserProfile(null);
+  };
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -304,18 +313,27 @@ const Banner = () => {
     <>
       <Header />
       <div className="relative min-h-[350px] md:min-h-[605px] w-full px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-0">
-        <div className="w-full flex items-center justify-center">
-          <div className="flex items-center md:items-start gap-4">
-            <div className="flex w-full flex-col items-center justify-center mt-20">
-              <button
-                className="bg-white text-black rounded-lg px-4 py-2 shadow-md hover:bg-gray-100 transition duration-300"
-                onClick={() => googleLogin()}
-              >
-                Sign in with Google 🚀{" "}
-              </button>
+        <div className="md:w-full flex-col md:flex items-center justify-center">
+          <div className="md:flex items-center md:items-start gap-4">
+            <div className="flex w-full flex-col items-center justify-center mt-12">
+              {userProfile ? (
+                <button
+                  className="bg-white text-black rounded-lg px-4 py-2 shadow-md hover:bg-gray-100 transition duration-300"
+                  onClick={() => logOut()}
+                >
+                  Log out
+                </button>
+              ) : (
+                <button
+                  className="bg-white text-black rounded-lg px-4 py-2 shadow-md hover:bg-gray-100 transition duration-300"
+                  onClick={() => googleLogin()}
+                >
+                  Sign in with Google 🚀{" "}
+                </button>
+              )}
 
               <div className=" flex flex-col items-center justify-between">
-                <h1 className="pt-24 text-center text-xl font-medium text-dark md:pt-[47px] md:text-4xl">
+                <h1 className="pt-8 text-center text-xl font-medium text-dark md:pt-12 md:text-4xl">
                   {title}
                 </h1>
                 <div className="relative mx-auto mt-16 items-center justify-center">
@@ -340,37 +358,40 @@ const Banner = () => {
                     </button>
                   </div>
                 </div>
-                <div className="my-4">
+                <div className="my-4 text-foreground/50">
                   {transcript && (
-                    <div>
+                    <div className="max-w-[300px]">
                       <h2>Transcript:</h2>
                       <p>{transcript}</p>
                     </div>
                   )}
                 </div>
                 <div className="p-2">
-                  <Button onClick={createEvent} disabled={!accessToken}>
+                  <Button onClick={createEvent} disabled={!transcript}>
                     Create Event 😎
                   </Button>
                 </div>
               </div>
               {userProfile && (
                 <div className="mt-4 p-4 border border-card rounded shadow">
-                  <h2 className="text-2xl font-bold">User Profile</h2>
-                  <p>
-                    <strong>ID:</strong> {userProfile.sub}
-                  </p>
+                  <div className="flex gap-2">
+                    <div className="flex items-center justify-center">
+                      <img
+                        src={userProfile.picture}
+                        alt="Profile Image"
+                        className="rounded-full h-6 w-6"
+                      />
+                    </div>
+                    <h2 className="flex items-center justify-center text-2xl font-bold">
+                      User Profile
+                    </h2>
+                  </div>
                   <p>
                     <strong>Name:</strong> {userProfile.name}
                   </p>
                   <p>
                     <strong>Email:</strong> {userProfile.email}
                   </p>
-                  <img
-                    src={userProfile.picture}
-                    alt="Profile Image"
-                    className="rounded-full h-6 w-6"
-                  />
                 </div>
               )}
             </div>

@@ -23,7 +23,7 @@ export default function Footer() {
             onClick={() => {
               posthog.capture("clicked-social", { platform: "facebook" });
             }}
-            style={{ height: 45, width: 45 }}
+            style={{ height: 35, width: 35 }}
             url="https://www.facebook.com/profile.php?id=61562199479506"
             target="_blank"
           />
@@ -31,7 +31,7 @@ export default function Footer() {
             onClick={() => {
               posthog.capture("clicked-social", { platform: "twitter" });
             }}
-            style={{ height: 45, width: 45 }}
+            style={{ height: 35, width: 35 }}
             url="https://x.com/ComicSpinApp"
             target="_blank"
           />
@@ -39,7 +39,7 @@ export default function Footer() {
             onClick={() => {
               posthog.capture("clicked-social", { platform: "reddit" });
             }}
-            style={{ height: 45, width: 45 }}
+            style={{ height: 35, width: 35 }}
             url="https://www.reddit.com/r/ComicSpin/"
             target="_blank"
           />
@@ -47,7 +47,7 @@ export default function Footer() {
             onClick={() => {
               posthog.capture("clicked-social", { platform: "discord" });
             }}
-            style={{ height: 45, width: 45 }}
+            style={{ height: 35, width: 35 }}
             url="https://discord.com/invite/CkT3R7d8G7"
             target="_blank"
           />

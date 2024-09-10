@@ -36,14 +36,6 @@ const Waitlist = () => {
                 Thank you for signing up!
               </p>
             </div>
-            <div className="mx-auto mt-6 max-w-2xl lg:mx-0 lg:max-w-none">
-              <a
-                href="mailto:support@1851labs.com"
-                className="text-lg text-indigo-600 font-semibold"
-              >
-                Contact Us <span aria-hidden="true">&rarr;</span>
-              </a>
-            </div>
           </div>
         </div>
       ) : (
@@ -77,18 +69,12 @@ const Waitlist = () => {
               <p className="mt-1 text-xs text-foreground/30">
                 *only supporting Google Calendar right now
               </p>
-              <div className="mt-10 flex items-center justify-center gap-x-6">
+              <div className="mt-8 flex items-center justify-center ">
                 <SignUpButton mode="modal">
-                  <button className="rounded-md bg-indigo-600 px-4 py-2.5 text-lg font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                  <button className="rounded-md bg-indigo-600 px-5 py-2.5 text-lg font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
                     Sign up
                   </button>
                 </SignUpButton>
-                <a
-                  href="mailto:support@1851labs.com"
-                  className="text-md font-semibold leading-6 text-gray-900"
-                >
-                  Contact Us <span aria-hidden="true">&rarr;</span>
-                </a>
               </div>
             </div>
           </div>

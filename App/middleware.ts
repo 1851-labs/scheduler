@@ -13,6 +13,7 @@ export default authMiddleware({
     "/monitoring", // used to proxy sentry errors to sentry (avoids browsers blocking)
     "/component-library",
     "/record",
+    "/privacy-policy",
   ],
 });
 

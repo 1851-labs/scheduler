@@ -21,12 +21,15 @@ const Header = () => {
             VoCal
           </h1>
         </Link>
-        <Link
+        {/* <Link
           href="/"
           onClick={handleRefresh}
           className="hover:text-foreground/60"
         >
           Home
+        </Link> */}
+        <Link href="/sign-in" className="hover:text-foreground/60">
+          Sign up
         </Link>
         {/* <Link href="/component-library">View UI Examples</Link> */}
         {/* buttons */}

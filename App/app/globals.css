@@ -17,7 +17,8 @@
 }
 
 body {
-  background: #ebf4f4;
+  /* background: #ebf4f4; */
+  background: white;
 }
 
 .max-width {
@@ -206,7 +207,8 @@ specified below to the foreground text.
 @layer base {
   :root {
     /* The color used for the website's background */
-    --background: 180 29% 94%;
+    /* --background: 180 29% 94%; */ /* light / mint green */
+    --background: 136 0% 100%; /* white */
 
     /* The color used for foreground objects like text */
     --foreground: 222.2 47.4% 11.2%;

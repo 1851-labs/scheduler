@@ -17,11 +17,15 @@ const Header = () => {
     <div className="z-10 container relative m-0 mx-auto py-10 md:px-10">
       <div className="flex items-left ml-2 justify-between">
         <Link className="flex w-fit items-center gap-[2px]" href="/">
-          <h1 className="text-xl font-medium text-[#25292F] md:text-3xl">
+          <h1 className="text-xl font-medium text-[#25292F] md:text-3xl hover:text-foreground/60">
             VoCal
           </h1>
         </Link>
-        <Link href="/" onClick={handleRefresh}>
+        <Link
+          href="/"
+          onClick={handleRefresh}
+          className="hover:text-foreground/60"
+        >
           Home
         </Link>
         {/* <Link href="/component-library">View UI Examples</Link> */}

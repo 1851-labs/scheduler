@@ -86,11 +86,9 @@ const Banner = () => {
             },
           }
         );
-
         if (!response.ok) {
           throw new Error("Failed to fetch events");
         }
-
         const data = await response.json();
         setEvents(data.items || []);
       } catch (error) {
@@ -315,13 +313,10 @@ const Banner = () => {
     if (transcript) {
       createEvent();
     }
-  }, [transcript]);
-
-  useEffect(() => {
     if (accessToken) {
       setSlideIn(true);
     }
-  }, [accessToken]);
+  }, [transcript, accessToken]);
 
   return (
     <>
@@ -429,8 +424,9 @@ const Banner = () => {
                 <div className="m-4 w-[450px]">
                   {upcomingEvents && <h2 className="pb-4">Upcoming Events</h2>}
 
-                  <ul className="flex-col space-y-4">
+                  <ul className="flex-col space-y-5">
                     {upcomingEvents.map((event) => {
+                      // console.log(event);
                       if (!event.summary) {
                         return null; // Skip rendering this event
                       }
@@ -439,11 +435,13 @@ const Banner = () => {
                         ? formatTime(event.start.dateTime)
                         : "All Day Event";
 
+                      const eventLink = event.htmlLink;
                       return (
                         //TODO: link each card to its calendar event
                         <li key={event.id}>
                           <CalendarCard
                             title={event.summary}
+                            link={eventLink}
                             date={
                               parseDate(event.start?.date) ||
                               formatDate(event.start?.dateTime) ||

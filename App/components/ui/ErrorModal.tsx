@@ -1,12 +1,10 @@
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
   DialogFooter,
-  DialogClose,
 } from "../shadcn/Dialog";
 import { Button } from "@/components/ui/button";
 

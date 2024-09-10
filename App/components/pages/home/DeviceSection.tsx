@@ -1,10 +1,13 @@
 import Image from "next/image";
+import Header from "@/components/ui/Header";
 
-const DeviceSection = () => {
+const Waitlist = () => {
   return (
-    <div className="max-width py-10">
-      <div className="flex w-full items-center">
-        {/*
+    <>
+      <Header />
+      <div className="max-width py-10">
+        <div className="flex w-full items-center">
+          {/*
         <Image
           src="/images/mobile_example2.png"
           width={500}
@@ -22,10 +25,11 @@ const DeviceSection = () => {
           />
         </div>
         */}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
-export default DeviceSection;
+export default Waitlist;
 

@@ -11,10 +11,10 @@ import { Toaster } from "react-hot-toast";
 
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
-let title = "Scheduler";
-let description = "";
-let url = "https://1851labs.com";
-let sitename = "1851labs.com";
+let title = "VoCal";
+let description = "Voice-to-text scheduler!";
+let url = "https://myvocal.co";
+let sitename = "myvocal.co";
 
 export const metadata: Metadata = {
   metadataBase: new URL(url),

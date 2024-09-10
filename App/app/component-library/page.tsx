@@ -1,6 +1,7 @@
 "use client";
 import Header from "@/components/ui/Header";
 import Banner from "@/components/pages/home/Banner";
+import Waitlist from "@/components/pages/home/Waitlist";
 import ReactGA from "react-ga4";
 import { Button } from "@/components/shadcn/Button";
 import { ChevronRight } from "lucide-react";

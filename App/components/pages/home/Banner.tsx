@@ -12,7 +12,6 @@ import posthog from "posthog-js";
 import { Mic } from "react-feather";
 
 import CalendarCard from "@/components/ui/CalendarCard";
-import { Button } from "@/components/shadcn/Button";
 import ErrorModal from "@/components/ui/ErrorModal";
 
 const Banner = () => {

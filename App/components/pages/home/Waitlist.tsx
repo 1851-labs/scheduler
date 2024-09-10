@@ -63,8 +63,8 @@ const Waitlist = () => {
                 Speak. Schedule. Simplify.
               </h1>
               <p className="mt-6 text-lg leading-8 text-foreground/70">
-                Create Google Calendar events with your voice using AI.
-                Schedule, set reminders, and stay updated effortlessly.
+                Create Google Calendar events with your voice. Schedule
+                meetings, set reminders, and stay updated effortlessly.
               </p>
               <p className="mt-1 text-xs text-foreground/30">
                 *only supporting Google Calendar right now

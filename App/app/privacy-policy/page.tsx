@@ -5,7 +5,7 @@ const PrivacyPolicy = () => {
   return (
     <>
       <Header />
-      <div className="container mx-auto px-32 py-12">
+      <div className="container mx-auto px-16 py-8 md:px-32 md:py-12">
         <h1 className="text-3xl font-bold mb-4">VoCal Privacy Policy 🔒</h1>
 
         <h2 className="text-2xl font-bold mb-2">Introduction</h2>

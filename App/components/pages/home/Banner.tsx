@@ -312,14 +312,28 @@ const Banner = () => {
       <div className="relative min-h-[350px] md:min-h-[605px] w-full px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-0">
         <div className="md:w-full flex-col md:flex items-center justify-center">
           <div className="md:flex items-center md:items-start gap-4">
-            <div className="flex w-full flex-col items-center justify-center mt-12">
+            <div className="flex w-full flex-col items-center justify-center mt-4">
               {userProfile ? (
-                <button
-                  className="bg-white text-black rounded-lg px-4 py-2 shadow-md hover:bg-gray-100 transition duration-300"
-                  onClick={() => logOut()}
-                >
-                  Log out
-                </button>
+                <div className="mt-4 p-4 border border-card rounded shadow">
+                  <div className="flex gap-2">
+                    <div className="flex items-center justify-center">
+                      <img
+                        src={userProfile.picture}
+                        alt="Profile Image"
+                        className="rounded-full h-6 w-6"
+                      />
+                    </div>
+                    <h2 className="flex items-center justify-center text-2xl font-bold">
+                      User Profile
+                    </h2>
+                  </div>
+                  <p>
+                    <strong>Name:</strong> {userProfile.name}
+                  </p>
+                  <p>
+                    <strong>Email:</strong> {userProfile.email}
+                  </p>
+                </div>
               ) : (
                 <div className="flex-col justify-center max-w-[300px] mb-4">
                   <div className="flex justify-center">
@@ -384,28 +398,6 @@ const Banner = () => {
                   </Button>
                 </div>
               </div>
-              {userProfile && (
-                <div className="mt-4 p-4 border border-card rounded shadow">
-                  <div className="flex gap-2">
-                    <div className="flex items-center justify-center">
-                      <img
-                        src={userProfile.picture}
-                        alt="Profile Image"
-                        className="rounded-full h-6 w-6"
-                      />
-                    </div>
-                    <h2 className="flex items-center justify-center text-2xl font-bold">
-                      User Profile
-                    </h2>
-                  </div>
-                  <p>
-                    <strong>Name:</strong> {userProfile.name}
-                  </p>
-                  <p>
-                    <strong>Email:</strong> {userProfile.email}
-                  </p>
-                </div>
-              )}
             </div>
 
             {accessToken && (
@@ -450,7 +442,7 @@ const Banner = () => {
             )}
           </div>
         </div>
-        <div>
+        <div className="flex justify-center mt-4">
           {userProfile && (
             <button
               className="bg-white text-black rounded-lg px-4 py-2 shadow-md hover:bg-gray-100 transition duration-300"

@@ -12,7 +12,6 @@ export default authMiddleware({
     "/api/sentry-example-api", // test sentry
     "/monitoring", // used to proxy sentry errors to sentry (avoids browsers blocking)
     "/component-library",
-    "/record",
     "/privacy-policy",
   ],
 });

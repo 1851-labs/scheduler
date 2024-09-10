@@ -8,10 +8,12 @@ import { parseISO, parse, format } from "date-fns";
 import { useGoogleLogin, googleLogout } from "@react-oauth/google";
 
 import posthog from "posthog-js";
-import CalendarCard from "@/components/ui/CalendarCard";
-import { Button } from "@/components/shadcn/Button";
 
 import { Mic } from "react-feather";
+
+import CalendarCard from "@/components/ui/CalendarCard";
+import { Button } from "@/components/shadcn/Button";
+import ErrorModal from "@/components/ui/ErrorModal";
 
 const Banner = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -26,6 +28,8 @@ const Banner = () => {
   const [totalSeconds, setTotalSeconds] = useState(0);
 
   const [transcript, setTranscript] = useState<string | null>(null);
+
+  const [viewModal, setViewModal] = useState(false);
 
   const [slideIn, setSlideIn] = useState(false);
 
@@ -162,7 +166,6 @@ const Banner = () => {
 
         const event = {
           summary: name,
-          location: location,
           description: description,
           start: startDateTime
             ? {
@@ -172,10 +175,14 @@ const Banner = () => {
             : {
                 date: date,
               },
-          end: {
-            dateTime: endDateTime,
-            timeZone: userTimezone,
-          },
+          end: startTime
+            ? {
+                dateTime: endDateTime,
+                timeZone: userTimezone,
+              }
+            : {
+                date: date,
+              },
           reminders: {
             useDefault: false,
             overrides: [
@@ -183,6 +190,7 @@ const Banner = () => {
               { method: "popup", minutes: 10 },
             ],
           },
+          ...(location && { location: location }),
         };
 
         // Send the request to create the event using fetch
@@ -199,6 +207,7 @@ const Banner = () => {
         );
 
         if (!response.ok) {
+          setViewModal(true);
           const errorText = await response.text();
           console.error(
             `Error creating event: ${response.status} ${response.statusText}`,
@@ -211,6 +220,7 @@ const Banner = () => {
         console.log("Event created:", data.htmlLink);
       }
     } catch (error) {
+      setViewModal(true);
       console.error("Error entering creating event:", error);
     }
   };
@@ -241,10 +251,11 @@ const Banner = () => {
       });
 
       const { storageId } = await result.json();
-
       const transcription = await transcribe({ storageId });
       console.log(transcription.transcript);
       setTranscript(transcription.transcript);
+      setTitle("Press to Record");
+      setTotalSeconds(0);
     };
     setMediaRecorder(recorder as any);
     recorder.start();
@@ -264,7 +275,6 @@ const Banner = () => {
         setTotalSeconds((prevTotalSeconds) => prevTotalSeconds + 1);
       }, 1000);
     }
-
     return () => clearInterval(interval);
   }, [isRunning]);
 
@@ -300,6 +310,13 @@ const Banner = () => {
       console.error("Error processing transcript:", error);
     }
   };
+
+  useEffect(() => {
+    if (transcript) {
+      createEvent();
+    }
+  }, [transcript]);
+
   useEffect(() => {
     if (accessToken) {
       setSlideIn(true);
@@ -308,6 +325,9 @@ const Banner = () => {
 
   return (
     <>
+      {viewModal && (
+        <ErrorModal isOpen={viewModal} setViewModal={setViewModal} />
+      )}
       <Header />
       <div className="relative min-h-[350px] md:min-h-[605px] w-full px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-0">
         <div className="md:w-full flex-col md:flex items-center justify-center">
@@ -392,11 +412,11 @@ const Banner = () => {
                     </div>
                   )}
                 </div>
-                <div className="p-2">
+                {/* <div className="p-2">
                   <Button onClick={createEvent} disabled={!transcript}>
                     Create Event 😎
                   </Button>
-                </div>
+                </div> */}
               </div>
             </div>
 

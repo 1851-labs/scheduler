@@ -307,7 +307,7 @@ const TRANSCRIPT_SYS_PROMPT: PromptTemplate = PromptTemplate.fromTemplate(
   Your task is to extract specific details from a given text. 
   Ensure that dates are formatted like so, "2024-09-11" and startTime and endTime is formatted in ISO 8601 format, e.g., "09:00:00". 
   If the year is not specified in the transcript, assume it is 2024. 
-  If a startTime or endTime is not specified, leave it blank.
+  If a startTime or endTime is not specified, leave it undefined.
   If a startTime is mentioned without an endTime, assume the endTime is 1 hour after the startTime.
   Be specific in your answers and use common sense. Answer in valid JSON format.`
 );
@@ -317,9 +317,9 @@ const TRANSCRIPT_USER_PROMPT: PromptTemplate = PromptTemplate.fromTemplate(
   Ensure that dates are formatted like so, "2024-09-11".
   startTime and endTime should be in ISO 8601 format, e.g., "09:00:00". 
   If the year is not specified in the transcript, assume it is 2024. 
-  If a startTime or endTime is not specified, leave it blank.
+  If a startTime or endTime is not specified, leave it undefined.
   If a startTime is mentioned without an endTime, assume the endTime is 1 hour after the startTime.
-  If a location is not specified, leave it blank.
+  If a location is not specified, leave it undefined.
   Generate an appropriate event name and description based on the provided context. 
   Ensure all fields are present and valid, even if you need to make educated guesses. 
   The response should strictly be in valid JSON format."

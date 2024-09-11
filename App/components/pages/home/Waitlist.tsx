@@ -33,7 +33,10 @@ const Waitlist = () => {
                 We're working on onboarding you
               </h2>
               <p className="mt-6 text-lg leading-8 text-foreground/80">
-                Thank you for signing up!
+                Thank you for signing up! We'll keep you updated with insider
+                previews, progress updates, and an invitation to try out VoCal
+                as soon as it's ready for you. Keep an eye on your inbox — you
+                won’t want to miss it!
               </p>
             </div>
           </div>

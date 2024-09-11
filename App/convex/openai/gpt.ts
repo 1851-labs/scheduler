@@ -302,6 +302,7 @@ const transcriptSchema = z.object({
   endTime: z.string().optional(),
   description: z.string(),
 });
+//TODO: feed in todays date so that chatgpt knows when 'thursday' is
 const TRANSCRIPT_SYS_PROMPT: PromptTemplate = PromptTemplate.fromTemplate(
   `You're an expert in natural language processing and information extraction. 
   Your task is to extract specific details from a given text. 

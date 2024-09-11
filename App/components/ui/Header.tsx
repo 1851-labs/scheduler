@@ -17,7 +17,7 @@ const Header = () => {
     <div className="z-10 container relative m-0 mx-auto py-10 md:px-10">
       <div className="flex items-left ml-2 justify-between">
         <Link className="flex w-fit items-center gap-[2px]" href="/">
-          <h1 className="text-xl font-medium text-[#25292F] md:text-3xl hover:text-foreground/60">
+          <h1 className="text-xl font-medium text-[#25292F] md:text-3xl  text-foreground/90 hover:text-foreground">
             VoCal
           </h1>
         </Link>
@@ -28,7 +28,10 @@ const Header = () => {
         >
           Home
         </Link> */}
-        <Link href="/sign-in" className="hover:text-foreground/60">
+        <Link
+          href="/sign-in"
+          className=" text-foreground/50 hover:text-foreground/80"
+        >
           Sign up
         </Link>
         {/* <Link href="/component-library">View UI Examples</Link> */}

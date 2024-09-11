@@ -9,10 +9,12 @@ import { useGoogleLogin, googleLogout } from "@react-oauth/google";
 
 import posthog from "posthog-js";
 
-import { Mic } from "react-feather";
+import { ExternalLink, Mic } from "react-feather";
 
 import CalendarCard from "@/components/ui/CalendarCard";
 import ErrorModal from "@/components/ui/ErrorModal";
+import { Toaster } from "@/components/shadcn/Toaster";
+import { useToast } from "@/components/shadcn/Use-toast";
 
 const Banner = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -29,12 +31,13 @@ const Banner = () => {
   const [transcript, setTranscript] = useState<string | null>(null);
 
   const [viewModal, setViewModal] = useState(false);
-
   const [slideIn, setSlideIn] = useState(false);
+
+  const { toast } = useToast();
 
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
-      console.log(tokenResponse);
+      // console.log(tokenResponse);
 
       try {
         const response = await fetch(
@@ -51,16 +54,17 @@ const Banner = () => {
         }
 
         const userInfo = await response.json();
-        console.log(userInfo);
+        // console.log(userInfo);
 
         setUserProfile(userInfo);
         setAccessToken(tokenResponse.access_token);
         posthog.capture("user-clicked-signin");
       } catch (error) {
-        console.error("Error fetching user info:", error);
+        console.error("Error fetching user info (googleLogin):", error);
       }
     },
-    onError: (errorResponse) => console.log(errorResponse),
+    onError: (errorResponse) =>
+      console.log("googlelogin onerror", errorResponse),
     scope: "https://www.googleapis.com/auth/calendar", // Scope for Calendar API
   });
 
@@ -86,7 +90,7 @@ const Banner = () => {
           }
         );
         if (!response.ok) {
-          throw new Error("Failed to fetch events");
+          throw new Error("Failed to fetch events !response.ok");
         }
         const data = await response.json();
         setEvents(data.items || []);
@@ -100,7 +104,7 @@ const Banner = () => {
     }
   }, [accessToken]);
 
-  const upcomingEvents = events.slice(0, 5);
+  const upcomingEvents = events.slice(0, 4);
 
   const getUserTimezone = async (accessToken: string) => {
     try {
@@ -164,7 +168,7 @@ const Banner = () => {
         const event = {
           summary: name,
           description: description,
-          start: startDateTime
+          start: startTime
             ? {
                 dateTime: startDateTime,
                 timeZone: userTimezone,
@@ -205,20 +209,35 @@ const Banner = () => {
 
         if (!response.ok) {
           setViewModal(true);
-          const errorText = await response.text();
-          console.error(
-            `Error creating event: ${response.status} ${response.statusText}`,
-            errorText
-          );
+          // const errorText = await response.text();
+          // console.error(
+          //   `Error creating event: ${response.status} ${response.statusText}`,
+          //   errorText
+          // );
           throw new Error(`Error creating event: ${response.statusText}`);
         }
 
         const data = await response.json();
-        console.log("Event created:", data.htmlLink);
+        toast({
+          title: "Event created!",
+          description: (
+            <span className="flex items-center space-x-1 text-muted-foreground hover:text-foreground">
+              <a
+                href={data.htmlLink}
+                className="underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Click here to view event
+              </a>
+              <ExternalLink className="h-3 w-3" />
+            </span>
+          ),
+        });
       }
     } catch (error) {
       setViewModal(true);
-      console.error("Error entering creating event:", error);
+      console.error("Error creating event(create event trycatch):", error);
     }
   };
 
@@ -249,7 +268,7 @@ const Banner = () => {
 
       const { storageId } = await result.json();
       const transcription = await transcribe({ storageId });
-      console.log(transcription.transcript);
+      // console.log(transcription.transcript);
       setTranscript(transcription.transcript);
       setTitle("Press to Record");
       setTotalSeconds(0);
@@ -282,6 +301,7 @@ const Banner = () => {
   const handleRecordClick = async () => {
     if (title === "Press to Record") {
       setTitle("Recording...");
+      setTranscript(null);
       startRecording();
     } else if (title === "Recording...") {
       setTitle("Processing...");
@@ -304,7 +324,7 @@ const Banner = () => {
         name: result.name,
       };
     } catch (error) {
-      console.error("Error processing transcript:", error);
+      console.error("Error processing transcript(extract transcript):", error);
     }
   };
 
@@ -323,30 +343,25 @@ const Banner = () => {
         <ErrorModal isOpen={viewModal} setViewModal={setViewModal} />
       )}
       <Header />
+      <Toaster />
       <div className="relative min-h-[350px] md:min-h-[605px] w-full px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-0">
         <div className="md:w-full flex-col md:flex items-center justify-center">
           <div className="md:flex items-center md:items-start gap-4">
             <div className="flex w-full flex-col items-center justify-center mt-4">
               {userProfile ? (
                 <div className="mt-4 p-4 border border-card rounded shadow">
-                  <div className="flex gap-2">
+                  <div className="flex gap-3">
                     <div className="flex items-center justify-center">
                       <img
                         src={userProfile.picture}
                         alt="Profile Image"
-                        className="rounded-full h-6 w-6"
+                        className="rounded-full h-8 w-8"
                       />
                     </div>
-                    <h2 className="flex items-center justify-center text-2xl font-bold">
-                      User Profile
+                    <h2 className="inline-block text-2xl font-bold max-w-[200px] break-words whitespace-normal">
+                      {userProfile.name}
                     </h2>
                   </div>
-                  <p>
-                    <strong>Name:</strong> {userProfile.name}
-                  </p>
-                  <p>
-                    <strong>Email:</strong> {userProfile.email}
-                  </p>
                 </div>
               ) : (
                 <div className="flex-col justify-center max-w-[300px] mb-4">
@@ -406,11 +421,6 @@ const Banner = () => {
                     </div>
                   )}
                 </div>
-                {/* <div className="p-2">
-                  <Button onClick={createEvent} disabled={!transcript}>
-                    Create Event 😎
-                  </Button>
-                </div> */}
               </div>
             </div>
 
@@ -435,6 +445,11 @@ const Banner = () => {
                         : "All Day Event";
 
                       const eventLink = event.htmlLink;
+                      const eventLocation = event?.location
+                        ?.split(",")
+                        .slice(0, 2)
+                        .join(",");
+
                       return (
                         //TODO: link each card to its calendar event
                         <li key={event.id}>
@@ -447,7 +462,7 @@ const Banner = () => {
                               "No date available"
                             }
                             time={time}
-                            location={event.location}
+                            location={eventLocation}
                             description={event.description}
                           />
                         </li>

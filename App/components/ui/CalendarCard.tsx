@@ -29,7 +29,7 @@ export default function CalendarCard({
     <Link href={link ?? "#"} target="_blank" rel="noopener noreferrer">
       <Card className="w-full max-w-md border-card transition-transform duration-300 ease-in-out transform hover:scale-105 hover:shadow-md hover:shadow-foreground/20">
         <CardHeader>
-          <CardTitle>{title}</CardTitle>
+          <CardTitle className="mr-2">{title}</CardTitle>
           <CardDescription>
             <span className="flex items-center gap-2">
               <Calendar className="w-4 h-4 text-muted-foreground" />
@@ -46,6 +46,9 @@ export default function CalendarCard({
               </span>
             )}
           </CardDescription>
+          <div className="absolute top-4 right-4">
+            <ExternalLink className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+          </div>
         </CardHeader>
         {description && (
           <CardContent>

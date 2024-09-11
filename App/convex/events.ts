@@ -48,7 +48,7 @@ export const processTranscript = action({
         description: eventDetails.description,
       };
     } catch (error) {
-      console.error("Error processing transcript:", error);
+      console.error("Error processing transcript:(events.ts)", error);
       throw new Error("Failed to process the transcript.");
     }
   },

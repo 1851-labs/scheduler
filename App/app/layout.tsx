@@ -12,7 +12,7 @@ import { Toaster } from "react-hot-toast";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
 let title = "VoCal";
-let description = "Voice-to-text scheduler!";
+let description = "Voice-to-calendar scheduling app!";
 let url = "https://myvocal.co";
 let sitename = "myvocal.co";
 

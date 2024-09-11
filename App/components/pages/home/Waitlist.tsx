@@ -13,7 +13,7 @@ const Waitlist = () => {
     <div className="bg-white">
       <Header />
       {isSignedIn ? (
-        <div className="relative isolate px-6 py-64 lg:px-8">
+        <div className="relative isolate px-6 py-36 md:py-64 lg:px-8">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="mx-auto max-w-2xl lg:mx-0">
               <div className="flex gap-2 items-center mb-3">

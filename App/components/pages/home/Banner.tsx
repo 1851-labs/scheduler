@@ -13,8 +13,8 @@ import { ExternalLink, Mic } from "react-feather";
 
 import CalendarCard from "@/components/ui/CalendarCard";
 import ErrorModal from "@/components/ui/ErrorModal";
-import { Toaster } from "@/components/shadcn/Toaster";
-import { useToast } from "@/components/shadcn/Use-toast";
+import { Toaster } from "@/components/shadcn/toaster";
+import { useToast } from "@/components/shadcn/use-toast";
 
 const Banner = () => {
   const [isLoading, setIsLoading] = useState(false);

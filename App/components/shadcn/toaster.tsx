@@ -1,6 +1,6 @@
 "use client";
 
-import { useToast } from "./Use-toast";
+import { useToast } from "./use-toast";
 import {
   Toast,
   ToastClose,

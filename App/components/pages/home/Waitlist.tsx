@@ -13,7 +13,7 @@ const Waitlist = () => {
     <div className="bg-white">
       <Header />
       {isSignedIn ? (
-        <div className="relative isolate px-6 py-36 md:py-64 lg:px-8">
+        <div className="relative isolate px-6 py-24 md:py-56 lg:px-8">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="mx-auto max-w-2xl lg:mx-0">
               <div className="flex gap-2 items-center mb-3">
@@ -55,7 +55,7 @@ const Waitlist = () => {
               className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#63b3ed] to-[#9089fc] opacity-30 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
             />
           </div>
-          <div className="mx-auto max-w-2xl py-32 sm:py-36 lg:py-48">
+          <div className="mx-auto max-w-2xl py-28 sm:py-36 lg:py-36">
             <div className="flex items-center justify-center mb-8">
               <Mic className="text-foreground/50" />
               <ArrowRight className="text-foreground/50" />

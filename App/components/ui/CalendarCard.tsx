@@ -8,6 +8,7 @@ import {
 } from "@/components/shadcn/Card";
 import { Calendar, Clock, MapPin, ExternalLink } from "react-feather";
 import Link from "next/link";
+import posthog from "posthog-js";
 interface CalendarCardProps {
   title: string;
   link: string;
@@ -26,7 +27,14 @@ export default function CalendarCard({
   description,
 }: CalendarCardProps) {
   return (
-    <Link href={link ?? "#"} target="_blank" rel="noopener noreferrer">
+    <Link
+      href={link ?? "#"}
+      target="_blank"
+      rel="noopener noreferrer"
+      onClick={() => {
+        posthog.capture("user-clicked-eventcard");
+      }}
+    >
       <Card className="w-full max-w-md border-card transition-transform duration-300 ease-in-out transform hover:scale-105 hover:shadow-md hover:shadow-foreground/20">
         <CardHeader>
           <CardTitle className="mr-2">{title}</CardTitle>

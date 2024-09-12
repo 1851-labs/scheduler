@@ -74,6 +74,7 @@ const Banner = () => {
     googleLogout();
     window.location.reload();
     setUserProfile(null);
+    posthog.capture("user-clicked-logout");
   };
 
   useEffect(() => {
@@ -229,6 +230,11 @@ const Banner = () => {
                 className="underline"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => {
+                  posthog.capture("user-clicked-viewevent", {
+                    event_link: data.htmlLink,
+                  });
+                }}
               >
                 Click here to view event
               </a>
@@ -239,6 +245,7 @@ const Banner = () => {
       }
     } catch (error) {
       setViewModal(true);
+      posthog.capture("user-triggered-errormodal");
       console.error("Error creating event(create event trycatch):", error);
     }
   };
@@ -306,10 +313,12 @@ const Banner = () => {
       setTitle("Recording...");
       setTranscript(null);
       startRecording();
+      posthog.capture("user-clicked-record");
     } else if (title === "Recording...") {
       setTitle("Processing...");
       setIsLoading(true);
       stopRecording();
+      posthog.capture("user-stopped-recording");
     }
   };
 

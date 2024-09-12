@@ -28,12 +28,12 @@ const Header = () => {
         >
           Home
         </Link> */}
-        <Link
+        {/* <Link
           href="/sign-in"
           className=" text-foreground/50 hover:text-foreground/80"
         >
           Sign up
-        </Link>
+        </Link> */}
         {/* <Link href="/component-library">View UI Examples</Link> */}
         {/* buttons */}
         {/* login / user menu */}

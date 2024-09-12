@@ -9,12 +9,14 @@ import { useGoogleLogin, googleLogout } from "@react-oauth/google";
 
 import posthog from "posthog-js";
 
-import { ExternalLink, Mic } from "react-feather";
+import { ExternalLink, Mic, ArrowRight, Calendar } from "react-feather";
 
 import CalendarCard from "@/components/ui/CalendarCard";
 import ErrorModal from "@/components/ui/ErrorModal";
 import { Toaster } from "@/components/shadcn/toaster";
 import { useToast } from "@/components/shadcn/use-toast";
+
+import { LoadingSpinner } from "@/components/ui/loadingSpinner";
 
 const Banner = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -271,6 +273,7 @@ const Banner = () => {
       // console.log(transcription.transcript);
       setTranscript(transcription.transcript);
       setTitle("Press to Record");
+      setIsLoading(false);
       setTotalSeconds(0);
     };
     setMediaRecorder(recorder as any);
@@ -305,6 +308,7 @@ const Banner = () => {
       startRecording();
     } else if (title === "Recording...") {
       setTitle("Processing...");
+      setIsLoading(true);
       stopRecording();
     }
   };
@@ -349,79 +353,129 @@ const Banner = () => {
           <div className="md:flex items-center md:items-start gap-4">
             <div className="flex w-full flex-col items-center justify-center mt-4">
               {userProfile ? (
-                <div className="mt-4 p-4 border border-card rounded shadow">
-                  <div className="flex gap-3">
-                    <div className="flex items-center justify-center">
-                      <img
-                        src={userProfile.picture}
-                        alt="Profile Image"
-                        className="rounded-full h-8 w-8"
-                      />
-                    </div>
-                    <h2 className="inline-block text-2xl font-bold max-w-[200px] break-words whitespace-normal">
-                      {userProfile.name}
-                    </h2>
-                  </div>
-                </div>
+                <></>
               ) : (
-                <div className="flex-col justify-center max-w-[300px] mb-4">
-                  <div className="flex justify-center">
-                    <h1 className="font-semibold text-5xl">VoCal</h1>
+                // <div className="mt-4 p-4 border border-card rounded shadow">
+                //   <div className="flex gap-3">
+                //     <div className="flex items-center justify-center">
+                //       <img
+                //         src={userProfile.picture}
+                //         alt="Profile Image"
+                //         className="rounded-full h-8 w-8"
+                //       />
+                //     </div>
+                //     <h2 className="inline-block text-2xl font-bold max-w-[200px] break-words whitespace-normal">
+                //       {userProfile.name}
+                //     </h2>
+                //   </div>
+                // </div>
+                <div className="relative isolate px-6 pt-8 lg:px-8">
+                  <div
+                    aria-hidden="true"
+                    className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"
+                  >
+                    <div
+                      style={{
+                        clipPath:
+                          "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
+                      }}
+                      className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#63b3ed] to-[#9089fc] opacity-30 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
+                    />
                   </div>
-                  <div className="flex justify-center my-2 max-w-[250px]">
-                    <p className="text-center">
-                      Record your voice and create events in your calendar!
-                    </p>
+                  <div className="mx-auto max-w-2xl py-32 sm:py-36 lg:py-48">
+                    <div className="flex items-center justify-center mb-8">
+                      <Mic className="text-foreground/50" />
+                      <ArrowRight className="text-foreground/50" />
+                      <Calendar className="text-foreground/50" />
+                    </div>
+                    <div className="text-center">
+                      <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
+                        Speak. Schedule. Simplify.
+                      </h1>
+                      <p className="mt-6 text-lg leading-8 text-foreground/70">
+                        Create Google Calendar events with your voice. Schedule
+                        meetings, set reminders, and stay updated effortlessly.
+                      </p>
+                      <p className="mt-1 text-xs text-foreground/30">
+                        *only supporting Google Calendar right now
+                      </p>
+                      <div className="mt-8 flex items-center justify-center ">
+                        <button
+                          className="bg-secondary text-white rounded-lg px-4 py-2 shadow-md hover:bg-secondary/70 transition duration-300"
+                          onClick={() => googleLogin()}
+                        >
+                          Connect your Calendar 🚀{" "}
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex justify-center mt-2">
-                    <button
-                      className="bg-white text-black rounded-lg px-4 py-2 shadow-md hover:bg-gray-100 transition duration-300"
-                      onClick={() => googleLogin()}
-                    >
-                      Sign in with Google 🚀{" "}
-                    </button>
+                  <div
+                    aria-hidden="true"
+                    className="absolute inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-30rem)]"
+                  >
+                    <div
+                      style={{
+                        clipPath:
+                          "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
+                      }}
+                      className="relative left-[calc(50%+3rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 bg-gradient-to-tr from-[#63b3ed] to-[#9089fc] opacity-30 sm:left-[calc(50%+36rem)] sm:w-[72.1875rem]"
+                    />
                   </div>
                 </div>
               )}
+              {userProfile && (
+                <div className="w-full md:w-[270px]">
+                  <div className="bg-card/50 rounded-md mx-4 md:mx-0 md:px-6 pb-2 pt-6">
+                    <div className="flex flex-col items-center justify-between mt-0">
+                      <div className="flex items-center justify-center mb-2">
+                        <p className="text-2xl font-semibold text-foreground/80">
+                          {title}
+                        </p>
+                      </div>
 
-              <div className="flex flex-col items-center justify-between mt-4">
-                <div className="flex items-center justify-center">
-                  <p className="text-foreground/80">{title}</p>
-                </div>
-
-                <div className="relative mx-auto items-center justify-center">
-                  <div className="flex items-center justify-center">
-                    <div className="flex-col items-center justify-center">
-                      <h2 className="text-2xl text-foreground/50">
-                        {formatRecordingTime(Math.floor(totalSeconds / 60))}:
-                        {formatRecordingTime(totalSeconds % 60)}
-                      </h2>
-                    </div>
-                  </div>
-                  <div className="mt-2 flex w-fit items-center justify-center gap-[33px] pb-2 md:gap-[77px] ">
-                    <button
-                      onClick={handleRecordClick}
-                      className="relative inline-flex h-24 w-24 items-center justify-center rounded-full bg-gradient-radial from-white to-secondary shadow-xl transition-transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-                    >
-                      <div className="absolute h-20 w-20 rounded-full bg-secondary flex items-center justify-center">
-                        {!isRunning ? (
-                          <Mic className="h-12 w-12 text-white" />
-                        ) : (
-                          <Mic className="h-8 w-8 text-white animate-pulse transition" />
+                      <div className="relative mx-auto items-center justify-center">
+                        <div className="flex items-center justify-center">
+                          <div className="flex-col items-center justify-center">
+                            <h2 className="text-2xl text-foreground/50">
+                              {formatRecordingTime(
+                                Math.floor(totalSeconds / 60)
+                              )}
+                              :{formatRecordingTime(totalSeconds % 60)}
+                            </h2>
+                          </div>
+                        </div>
+                        <div className="mt-2 flex w-fit items-center justify-center gap-[33px] pb-2 md:gap-[77px] ">
+                          <button
+                            onClick={handleRecordClick}
+                            className={`relative inline-flex h-24 w-24 items-center justify-center rounded-full bg-gradient-radial from-white to-secondary shadow-xl transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${isLoading ? "opacity-50 cursor-not-allowed" : "hover:scale-105"}`}
+                            disabled={isLoading}
+                          >
+                            <div className="absolute h-20 w-20 rounded-full bg-secondary flex items-center justify-center">
+                              {!isRunning ? (
+                                !isLoading ? (
+                                  <Mic className="h-12 w-12 text-white" />
+                                ) : (
+                                  <LoadingSpinner className="h-12 w-12 text-white" />
+                                )
+                              ) : (
+                                <Mic className="h-12 w-12 text-white animate-pulse transition" />
+                              )}
+                            </div>
+                          </button>
+                        </div>
+                      </div>
+                      <div className="my-4 text-foreground/50">
+                        {transcript && (
+                          <div className="max-w-[300px]">
+                            <h2>Transcript:</h2>
+                            <p>{transcript}</p>
+                          </div>
                         )}
                       </div>
-                    </button>
+                    </div>
                   </div>
                 </div>
-                <div className="my-4 text-foreground/50">
-                  {transcript && (
-                    <div className="max-w-[300px]">
-                      <h2>Transcript:</h2>
-                      <p>{transcript}</p>
-                    </div>
-                  )}
-                </div>
-              </div>
+              )}
             </div>
 
             {accessToken && (
@@ -474,7 +528,7 @@ const Banner = () => {
             )}
           </div>
         </div>
-        <div className="flex justify-center mt-4">
+        <div className="flex justify-center mt-4 md:mb-8">
           {userProfile && (
             <button
               className="bg-white text-black rounded-lg px-4 py-2 shadow-md hover:bg-gray-100 transition duration-300"

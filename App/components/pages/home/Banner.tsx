@@ -67,7 +67,7 @@ const Banner = () => {
     },
     onError: (errorResponse) =>
       console.log("googlelogin onerror", errorResponse),
-    scope: "https://www.googleapis.com/auth/calendar", // Scope for Calendar API
+    scope: "https://www.googleapis.com/auth/calendar.events", // Scope for Calendar API
   });
 
   const logOut = () => {

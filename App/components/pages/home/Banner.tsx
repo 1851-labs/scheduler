@@ -39,8 +39,6 @@ const Banner = () => {
 
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
-      // console.log(tokenResponse);
-
       try {
         const response = await fetch(
           "https://www.googleapis.com/oauth2/v3/userinfo",

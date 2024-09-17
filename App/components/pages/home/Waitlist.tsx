@@ -4,6 +4,8 @@ import { useUser } from "@clerk/clerk-react";
 import { SignUpButton } from "@clerk/clerk-react";
 import { Calendar, Mic, ArrowRight } from "react-feather";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import posthog from "posthog-js";
+
 const Waitlist = () => {
   const { isSignedIn, user, isLoaded } = useUser();
   if (!isLoaded) {
@@ -74,7 +76,14 @@ const Waitlist = () => {
               </p>
               <div className="mt-8 flex items-center justify-center ">
                 <SignUpButton mode="modal">
-                  <button className="rounded-md bg-indigo-600 px-5 py-2.5 text-lg font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                  <button
+                    className="rounded-md bg-indigo-600 px-5 py-2.5 text-lg font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                    onClick={() => {
+                      posthog.capture("sign_up_click", {
+                        button_text: "Sign up",
+                      });
+                    }}
+                  >
                     Sign up
                   </button>
                 </SignUpButton>

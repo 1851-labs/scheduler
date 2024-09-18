@@ -5,6 +5,26 @@ import { SignUpButton } from "@clerk/clerk-react";
 import { Calendar, Mic, ArrowRight } from "react-feather";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import posthog from "posthog-js";
+import { BsGoogle, BsCalendar2Date, BsCloud, BsRobot } from "react-icons/bs";
+const features = [
+  {
+    name: "Integrate with Google.",
+    description:
+      "Easily sync with your Google Calendar to stay on top of your schedule.",
+    icon: BsGoogle,
+  },
+  {
+    name: "Smart schedule with AI.",
+    description:
+      "Use AI to automatically fill in information and provide suggestions.",
+    icon: BsRobot,
+  },
+  {
+    name: "Always be in the know.",
+    description: "Keep track of all your upcoming events in one simple view.",
+    icon: BsCalendar2Date,
+  },
+];
 
 const Waitlist = () => {
   const { isSignedIn, user, isLoaded } = useUser();
@@ -57,7 +77,7 @@ const Waitlist = () => {
               className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#63b3ed] to-[#9089fc] opacity-30 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
             />
           </div>
-          <div className="mx-auto max-w-2xl py-28 sm:py-36 lg:py-36">
+          <div className="mx-auto max-w-2xl py-28 sm:py-36 lg:py-48">
             <div className="flex items-center justify-center mb-8">
               <Mic className="text-foreground/50" />
               <ArrowRight className="text-foreground/50" />
@@ -101,6 +121,44 @@ const Waitlist = () => {
               }}
               className="-z-50 relative left-[calc(50%+3rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 bg-gradient-to-tr from-[#63b3ed] to-[#9089fc] opacity-30 sm:left-[calc(50%+36rem)] sm:w-[72.1875rem]"
             />
+          </div>
+
+          <div className="overflow-hidden py-24 sm:py-32">
+            <div className="mx-auto max-w-7xl px-6 lg:px-8">
+              <div className="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2">
+                <div className="lg:pr-8 lg:pt-4">
+                  <div className="lg:max-w-lg">
+                    <h2 className="text-base font-semibold leading-7 text-indigo-600">
+                      Never miss a moment
+                    </h2>
+                    <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+                      Stay effortlessly organized
+                    </p>
+                    <dl className="mt-10 max-w-xl space-y-8 text-base leading-7 text-gray-600 lg:max-w-none">
+                      {features.map((feature) => (
+                        <div key={feature.name} className="relative pl-9">
+                          <dt className="inline font-semibold text-gray-900">
+                            <feature.icon
+                              aria-hidden="true"
+                              className="absolute left-1 top-1 h-5 w-5 text-indigo-600"
+                            />
+                            {feature.name}
+                          </dt>{" "}
+                          <dd className="inline">{feature.description}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  </div>
+                </div>
+                <img
+                  alt="Product screenshot"
+                  src="/images/vocaldash.jpg"
+                  width={2032}
+                  height={1042}
+                  className="hidden md:block w-[48rem] max-w-none rounded-xl shadow-xl ring-1 ring-gray-400/10 sm:w-[40rem] md:-ml-4 lg:-ml-0"
+                />
+              </div>
+            </div>
           </div>
         </div>
       )}

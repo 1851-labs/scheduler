@@ -101,7 +101,7 @@ const PrivacyPolicy = () => {
         <p className="mb-4">
           We may update this Privacy Policy from time to time. Any changes will
           be reflected on this page, and we encourage you to review it
-          regularly. By continuing to use Vocal after changes are made, you
+          regularly. By continuing to use VoCal after changes are made, you
           agree to the updated policy.
         </p>
       </div>

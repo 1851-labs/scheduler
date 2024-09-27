@@ -7,8 +7,8 @@ const SplashPage = () => {
   ReactGA.send({ hitType: "pageview", page: "/", title: "SplashPage" });
   return (
     <div>
-      {/* <Banner /> */}
-      <Waitlist />
+      <Banner />
+      {/* <Waitlist /> */}
     </div>
   );
 };

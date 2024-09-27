@@ -60,7 +60,9 @@ export default function CalendarCard({
         </CardHeader>
         {description && (
           <CardContent>
-            <div>{description}</div>
+            <div className="flex break-words whitespace-normal overflow-hidden max-w-[300px] md:max-w-[400px]">
+              {description}
+            </div>
           </CardContent>
         )}
       </Card>

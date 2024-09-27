@@ -491,7 +491,7 @@ const Banner = () => {
                   slideIn ? "translate-x-0" : "translate-x-full"
                 }`}
               >
-                <div className="m-4 w-[450px]">
+                <div className="m-4 max-w-[350px] md:w-[450px]">
                   {upcomingEvents && <h2 className="pb-4">Upcoming Events</h2>}
 
                   <ul className="flex-col space-y-5">

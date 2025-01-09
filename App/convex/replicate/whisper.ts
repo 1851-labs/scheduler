@@ -16,7 +16,9 @@ interface whisperOutput {
 }
 
 const WHISPER: `${string}/${string}:${string}` =
-  "openai/whisper:cdd97b257f93cb89dede1c7584e3f3dfc969571b357dbcee08e793740bedd854";
+  "openai/whisper:8099696689d249cf8b122d833c36ac3f75505c666a395ca40ef26f68e7d3d16e";
+
+// "openai/whisper:cdd97b257f93cb89dede1c7584e3f3dfc969571b357dbcee08e793740bedd854";
 
 //4d50797290df275329f202e48c76360b3f22b08d28c196cbc54600319435f8d2 <-- old version of whisper
 
@@ -46,8 +48,9 @@ export const getTranscription = internalAction({
 
       return { transcript };
     } catch (error) {
+      console.log(error);
       return {
-        transcript: "Error occurred duringggg transcription",
+        transcript: "Error occurred duringggggg transcription",
       };
     }
   },

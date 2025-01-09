@@ -27,6 +27,7 @@ export const transcribeAudio = action({
       internal.replicate.whisper.getTranscription,
       { fileUrl: fileUrl as string }
     );
+    console.log("Transcript:", transcript);
     return transcript;
   },
 });

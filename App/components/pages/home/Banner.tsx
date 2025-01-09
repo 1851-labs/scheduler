@@ -24,6 +24,7 @@ const Banner = () => {
   const [userProfile, setUserProfile] = useState<any>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [events, setEvents] = useState<any[]>([]);
+  const [recentlyCreatedEvents, setRecentlyCreatedEvents] = useState<any[]>([]);
 
   const [title, setTitle] = useState("Press to Record");
   const [mediaRecorder, setMediaRecorder] = useState(null);
@@ -219,6 +220,7 @@ const Banner = () => {
         }
 
         const data = await response.json();
+        setRecentlyCreatedEvents((prevEvents) => [...prevEvents, data]);
         toast({
           title: "Event created!",
           description: (
@@ -487,10 +489,37 @@ const Banner = () => {
 
             {accessToken && (
               <div
-                className={`flex w-full justify-center transform transition-transform duration-1000 ${
+                className={`${recentlyCreatedEvents.length > 0 ? "flex-col sm:flex" : "flex"} w-full justify-center transform transition-transform duration-1000 ${
                   slideIn ? "translate-x-0" : "translate-x-full"
                 }`}
               >
+                {recentlyCreatedEvents.length > 0 && (
+                  <>
+                    <h2 className="pb-4">Recently Created</h2>
+                    <ul className="flex-col space-y-5">
+                      {recentlyCreatedEvents.map((event) => (
+                        <li key={event.id}>
+                          <CalendarCard
+                            title={event.summary}
+                            link={event.htmlLink}
+                            date={
+                              parseDate(event.start?.date) ||
+                              formatDate(event.start?.dateTime) ||
+                              "No date available"
+                            }
+                            time={
+                              event.start?.dateTime
+                                ? formatTime(event.start.dateTime)
+                                : "All Day Event"
+                            }
+                            location={event.location}
+                            description={event.description}
+                          />
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
                 <div className="m-4 max-w-[350px] md:w-[450px]">
                   {upcomingEvents && <h2 className="pb-4">Upcoming Events</h2>}
 

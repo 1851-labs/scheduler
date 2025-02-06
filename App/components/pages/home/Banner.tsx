@@ -11,20 +11,24 @@ import posthog from "posthog-js";
 
 import { ExternalLink, Mic, ArrowRight, Calendar } from "react-feather";
 
-import CalendarCard from "@/components/ui/CalendarCard";
 import ErrorModal from "@/components/ui/ErrorModal";
 import { Toaster } from "@/components/shadcn/toaster";
 import { useToast } from "@/components/shadcn/use-toast";
 
 import { LoadingSpinner } from "@/components/ui/loadingSpinner";
+import { useAuth } from "@/lib/authContext";
+import { useRouter } from "next/navigation";
 
 const Banner = () => {
+  const { login, logout } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
   const [userProfile, setUserProfile] = useState<any>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [events, setEvents] = useState<any[]>([]);
   const [recentlyCreatedEvents, setRecentlyCreatedEvents] = useState<any[]>([]);
+
+  const [userTimezone, setUserTimezone] = useState<string | null>(null);
 
   const [title, setTitle] = useState("Press to Record");
   const [mediaRecorder, setMediaRecorder] = useState(null);
@@ -37,40 +41,56 @@ const Banner = () => {
   const [slideIn, setSlideIn] = useState(false);
 
   const { toast } = useToast();
+  const router = useRouter();
 
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       try {
-        const response = await fetch(
-          "https://www.googleapis.com/oauth2/v3/userinfo",
-          {
-            headers: {
-              Authorization: `Bearer ${tokenResponse.access_token}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch user info");
-        }
-
-        const userInfo = await response.json();
-        // console.log(userInfo);
-
-        setUserProfile(userInfo);
+        await fetchUserInfo(tokenResponse.access_token);
         setAccessToken(tokenResponse.access_token);
+        login(tokenResponse.access_token);
+        // console.log(tokenResponse);
+        // const timezone = await getUserTimezone(tokenResponse.access_token);
+        const timezone = "America/New_York";
+        setUserTimezone(timezone);
+        router.push("/dashboard");
         posthog.capture("user-clicked-signin");
       } catch (error) {
-        console.error("Error fetching user info (googleLogin):", error);
+        console.error("Error during login:", error);
       }
     },
     onError: (errorResponse) =>
       console.log("googlelogin onerror", errorResponse),
-    scope: "https://www.googleapis.com/auth/calendar.events", // Scope for Calendar API
+    scope: "https://www.googleapis.com/auth/calendar.events",
   });
+
+  const fetchUserInfo = async (accessToken: string) => {
+    try {
+      const response = await fetch(
+        "https://www.googleapis.com/oauth2/v3/userinfo",
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }
+      );
+
+      if (response.status === 401) {
+        console.warn("Access token expired. Redirecting to login...");
+        googleLogin(); // Re-trigger login
+        return;
+      }
+
+      if (!response.ok) throw new Error("Failed to fetch user info");
+
+      const userInfo = await response.json();
+      setUserProfile(userInfo);
+    } catch (error) {
+      console.error("Error fetching user info:", error);
+    }
+  };
 
   const logOut = () => {
     googleLogout();
+    logout();
     window.location.reload();
     setUserProfile(null);
     posthog.capture("user-clicked-logout");
@@ -125,7 +145,7 @@ const Banner = () => {
       }
 
       const data = await response.json();
-      return data.value; // This is the user's timezone, e.g., 'America/Los_Angeles'
+      return data.value; // this is the user's timezone, e.g., 'America/Los_Angeles'
     } catch (error) {
       console.error("Error fetching user timezone:", error);
       throw error;
@@ -155,10 +175,9 @@ const Banner = () => {
       console.error("Access token is missing. Please log in first.");
       return;
     }
-
+    console.log(accessToken);
     try {
       const result = await handleExtractTranscript();
-      const userTimezone = await getUserTimezone(accessToken);
 
       if (result) {
         const { name, date, location, startTime, endTime, description } =
@@ -433,61 +452,62 @@ const Banner = () => {
                 </div>
               )}
               {userProfile && (
-                <div className="w-full md:w-[270px]">
-                  <div className="bg-card/50 rounded-md mx-4 md:mx-0 md:px-6 pb-2 pt-6">
-                    <div className="flex flex-col items-center justify-between mt-0">
-                      <div className="flex items-center justify-center mb-2">
-                        <p className="text-2xl font-semibold text-foreground/80">
-                          {title}
-                        </p>
-                      </div>
+                // <div className="w-full md:w-[270px]">
+                //   <div className="bg-card/50 rounded-md mx-4 md:mx-0 md:px-6 pb-2 pt-6">
+                //     <div className="flex flex-col items-center justify-between mt-0">
+                //       <div className="flex items-center justify-center mb-2">
+                //         <p className="text-2xl font-semibold text-foreground/80">
+                //           {title}
+                //         </p>
+                //       </div>
 
-                      <div className="relative mx-auto items-center justify-center">
-                        <div className="flex items-center justify-center">
-                          <div className="flex-col items-center justify-center">
-                            <h2 className="text-2xl text-foreground/50">
-                              {formatRecordingTime(
-                                Math.floor(totalSeconds / 60)
-                              )}
-                              :{formatRecordingTime(totalSeconds % 60)}
-                            </h2>
-                          </div>
-                        </div>
-                        <div className="mt-2 flex w-fit items-center justify-center gap-[33px] pb-2 md:gap-[77px] ">
-                          <button
-                            onClick={handleRecordClick}
-                            className={`relative inline-flex h-24 w-24 items-center justify-center rounded-full bg-gradient-radial from-white to-secondary shadow-xl transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${isLoading ? "opacity-50 cursor-not-allowed" : "hover:scale-105"}`}
-                            disabled={isLoading}
-                          >
-                            <div className="absolute h-20 w-20 rounded-full bg-secondary flex items-center justify-center">
-                              {!isRunning ? (
-                                !isLoading ? (
-                                  <Mic className="h-12 w-12 text-white" />
-                                ) : (
-                                  <LoadingSpinner className="h-12 w-12 text-white" />
-                                )
-                              ) : (
-                                <Mic className="h-12 w-12 text-white animate-pulse transition" />
-                              )}
-                            </div>
-                          </button>
-                        </div>
-                      </div>
-                      <div className="my-4 text-foreground/50">
-                        {transcript && (
-                          <div className="max-w-[300px]">
-                            <h2>Transcript:</h2>
-                            <p>{transcript}</p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                //       <div className="relative mx-auto items-center justify-center">
+                //         <div className="flex items-center justify-center">
+                //           <div className="flex-col items-center justify-center">
+                //             <h2 className="text-2xl text-foreground/50">
+                //               {formatRecordingTime(
+                //                 Math.floor(totalSeconds / 60)
+                //               )}
+                //               :{formatRecordingTime(totalSeconds % 60)}
+                //             </h2>
+                //           </div>
+                //         </div>
+                //         <div className="mt-2 flex w-fit items-center justify-center gap-[33px] pb-2 md:gap-[77px] ">
+                //           <button
+                //             onClick={handleRecordClick}
+                //             className={`relative inline-flex h-24 w-24 items-center justify-center rounded-full bg-gradient-radial from-white to-secondary shadow-xl transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${isLoading ? "opacity-50 cursor-not-allowed" : "hover:scale-105"}`}
+                //             disabled={isLoading}
+                //           >
+                //             <div className="absolute h-20 w-20 rounded-full bg-secondary flex items-center justify-center">
+                //               {!isRunning ? (
+                //                 !isLoading ? (
+                //                   <Mic className="h-12 w-12 text-white" />
+                //                 ) : (
+                //                   <LoadingSpinner className="h-12 w-12 text-white" />
+                //                 )
+                //               ) : (
+                //                 <Mic className="h-12 w-12 text-white animate-pulse transition" />
+                //               )}
+                //             </div>
+                //           </button>
+                //         </div>
+                //       </div>
+                //       <div className="my-4 text-foreground/50">
+                //         {transcript && (
+                //           <div className="max-w-[300px]">
+                //             <h2>Transcript:</h2>
+                //             <p>{transcript}</p>
+                //           </div>
+                //         )}
+                //       </div>
+                //     </div>
+                //   </div>
+                // </div>
+                <></>
               )}
             </div>
 
-            {accessToken && (
+            {/* {accessToken && (
               <div
                 className={`${recentlyCreatedEvents.length > 0 ? "flex-col sm:flex" : "flex"} w-full justify-center transform transition-transform duration-1000 ${
                   slideIn ? "translate-x-0" : "translate-x-full"
@@ -541,7 +561,6 @@ const Banner = () => {
                         .join(",");
 
                       return (
-                        //TODO: link each card to its calendar event
                         <li key={event.id}>
                           <CalendarCard
                             title={event.summary}
@@ -561,7 +580,7 @@ const Banner = () => {
                   </ul>
                 </div>
               </div>
-            )}
+            )} */}
           </div>
         </div>
         <div className="flex justify-center mt-4 md:mb-8">

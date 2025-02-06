@@ -26,6 +26,14 @@ export default function CalendarCard({
   location,
   description,
 }: CalendarCardProps) {
+  const truncateDescription = (description: string, maxLength: number) => {
+    if (description.length > maxLength) {
+      return description.substring(0, maxLength) + "...";
+    }
+    return description;
+  };
+  const truncatedDescription = truncateDescription(description ?? "", 200);
+
   return (
     <Link
       href={link ?? "#"}
@@ -61,7 +69,7 @@ export default function CalendarCard({
         {description && (
           <CardContent>
             <div className="flex break-words whitespace-normal overflow-hidden max-w-[300px] md:max-w-[400px]">
-              {description}
+              {truncatedDescription}
             </div>
           </CardContent>
         )}

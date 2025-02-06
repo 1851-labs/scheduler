@@ -8,7 +8,7 @@ import { api } from "@/convex/_generated/api";
 import { useAuth } from "@/lib/authContext";
 import { useAction, useMutation } from "convex/react";
 import { parseISO, format, parse } from "date-fns";
-import { ExternalLink, Mic } from "lucide-react";
+import { ExternalLink, Mic, Search } from "lucide-react";
 import { usePostHog } from "posthog-js/react";
 import { useEffect, useState } from "react";
 
@@ -17,12 +17,14 @@ export default function Dashb() {
   const { accessToken } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
-  const [userProfile, setUserProfile] = useState<any>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  // const [userProfile, setUserProfile] = useState<any>(null);
   // const [accessToken, setAccessToken] = useState<string | null>(null);
   const [events, setEvents] = useState<any[]>([]);
   const [recentlyCreatedEvents, setRecentlyCreatedEvents] = useState<any[]>([]);
 
   const [userTimezone, setUserTimezone] = useState<string | null>(null);
+  const timezone = "America/New_York";
 
   const [title, setTitle] = useState("Press to Record");
   const [mediaRecorder, setMediaRecorder] = useState(null);
@@ -55,6 +57,7 @@ export default function Dashb() {
   };
 
   useEffect(() => {
+    setUserTimezone(timezone);
     const fetchEvents = async () => {
       try {
         const now = new Date();
@@ -84,7 +87,21 @@ export default function Dashb() {
     }
   }, [accessToken]);
 
-  const upcomingEvents = events.slice(0, 4);
+  const filteredEvents = events.filter((event) => {
+    const lowerCaseSearchTerm = searchTerm.toLowerCase();
+    const eventDate = event.start?.dateTime
+      ? format(parseISO(event.start.dateTime), "yyyy-MM-dd") // Format as "2025-02-07"
+      : "";
+
+    return (
+      event.summary?.toLowerCase().includes(lowerCaseSearchTerm) ||
+      eventDate.includes(lowerCaseSearchTerm) ||
+      event.location?.toLowerCase().includes(lowerCaseSearchTerm) ||
+      event.description?.toLowerCase().includes(lowerCaseSearchTerm)
+    );
+  });
+
+  const upcomingEvents = filteredEvents.slice(0, 4);
 
   const createEvent = async () => {
     if (!accessToken) {
@@ -343,6 +360,16 @@ export default function Dashb() {
             </div>
             <div className="m-4 max-w-[350px] md:w-[450px]">
               {upcomingEvents && <h2 className="pb-4">Upcoming Events</h2>}
+              <div className="relative mb-4 ">
+                <input
+                  type="text"
+                  placeholder="Search events by title, date ..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="p-2 border rounded w-full focus:outline-none focus:ring-2 focus:ring-gray-500"
+                />
+                <Search className="text-gray-400 absolute right-3 top-1/2 transform -translate-y-1/2" />
+              </div>
 
               <ul className="flex-col space-y-5">
                 {upcomingEvents.map((event) => {

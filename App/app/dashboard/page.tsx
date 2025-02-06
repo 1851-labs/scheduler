@@ -10,7 +10,7 @@ import { api } from "@/convex/_generated/api";
 import { useAuth } from "@/lib/authContext";
 import { useAction, useMutation } from "convex/react";
 import { parseISO, format, parse } from "date-fns";
-import { ExternalLink, Mic, Search } from "lucide-react";
+import { Calendar, ExternalLink, Mic, Search } from "lucide-react";
 import { usePostHog } from "posthog-js/react";
 import { useEffect, useState } from "react";
 
@@ -20,8 +20,7 @@ export default function Dashb() {
   const [isLoading, setIsLoading] = useState(false);
 
   const [searchTerm, setSearchTerm] = useState("");
-  // const [userProfile, setUserProfile] = useState<any>(null);
-  // const [accessToken, setAccessToken] = useState<string | null>(null);
+
   const [events, setEvents] = useState<any[]>([]);
   const [recentlyCreatedEvents, setRecentlyCreatedEvents] = useState<any[]>([]);
 
@@ -39,6 +38,14 @@ export default function Dashb() {
   const [slideIn, setSlideIn] = useState(false);
 
   const { toast } = useToast();
+
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkIsMobile = () => setIsMobile(window.innerWidth < 768);
+    checkIsMobile();
+    window.addEventListener("resize", checkIsMobile);
+    return () => window.removeEventListener("resize", checkIsMobile);
+  }, []);
 
   const formatDate = (dateTime: string) => {
     const date = parseISO(dateTime);
@@ -306,6 +313,16 @@ export default function Dashb() {
     }
   }, [transcript, accessToken]);
 
+  const getFormattedDate = () => {
+    const date = new Date();
+    const dayOfWeek = date.toLocaleString("default", { weekday: "long" });
+    const day = date.getDate();
+    const month = date.toLocaleString("default", { month: "long" });
+
+    return { dayOfWeek, day, month };
+  };
+  const { dayOfWeek, day, month } = getFormattedDate();
+
   return (
     <>
       <Header />
@@ -361,8 +378,34 @@ export default function Dashb() {
                   </div>
                 </div>
               </div>
+              {!isMobile && (
+                <div className="bg-card/50 rounded-md mx-4 md:mx-0 md:px-6 p-6 mt-4">
+                  <div className="flex items-center justify-center space-x-4">
+                    <a
+                      href={`https://calendar.google.com/calendar/u/0/r`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center hover:opacity-80 transition-opacity"
+                    >
+                      <Calendar className="h-8 w-8 text-foreground/50" />
+                    </a>
+
+                    <div className="flex flex-col items-start justify-between">
+                      <div className="text-2xl text-foreground/50">
+                        {dayOfWeek},
+                      </div>
+                      <div className="flex items-center justify-center">
+                        <p className="text-2xl font-semibold text-foreground/80">
+                          {month} {day}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
-            <div className="m-4 max-w-[350px] md:w-[450px]">
+            {/* <div className="m-4 max-w-[350px] md:w-[450px]"> */}
+            <div className="m-4 min-w-[350px] md:min-w-[650px] md:max-w-[650px] lg:max-w-[800px]">
               {upcomingEvents && <h2 className="pb-4">Upcoming Events</h2>}
               <div className="relative mb-4 ">
                 <input

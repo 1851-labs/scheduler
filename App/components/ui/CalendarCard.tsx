@@ -43,7 +43,7 @@ export default function CalendarCard({
         posthog.capture("user-clicked-eventcard");
       }}
     >
-      <Card className="w-full max-w-md border-card transition-transform duration-300 ease-in-out transform hover:scale-105 hover:shadow-md hover:shadow-foreground/20">
+      <Card className="w-full border-card transition-transform duration-300 ease-in-out transform hover:scale-105 hover:shadow-md hover:shadow-foreground/20">
         <CardHeader>
           <CardTitle className="mr-2">{title}</CardTitle>
           <CardDescription>
@@ -68,7 +68,7 @@ export default function CalendarCard({
         </CardHeader>
         {description && (
           <CardContent>
-            <div className="flex break-words whitespace-normal overflow-hidden max-w-[300px] md:max-w-[400px]">
+            <div className="flex break-words whitespace-normal overflow-hidden ">
               {truncatedDescription}
             </div>
           </CardContent>

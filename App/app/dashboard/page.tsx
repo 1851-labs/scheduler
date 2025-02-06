@@ -1,6 +1,8 @@
 "use client";
 
 import { useToast } from "@/components/shadcn/use-toast";
+import { Toaster } from "@/components/shadcn/toaster";
+
 import CalendarCard from "@/components/ui/CalendarCard";
 import Header from "@/components/ui/Header";
 import { LoadingSpinner } from "@/components/ui/loadingSpinner";
@@ -160,7 +162,33 @@ export default function Dashb() {
             body: JSON.stringify(event),
           }
         );
+        const data = await response.json();
+        if (response.ok) {
+          setRecentlyCreatedEvents((prevEvents) => [...prevEvents, data]);
 
+          console.log("Event created:", data);
+          toast({
+            title: "Event created!",
+            description: (
+              <span className="flex items-center space-x-1 text-muted-foreground hover:text-foreground">
+                <a
+                  href={data.htmlLink}
+                  className="underline"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => {
+                    posthog.capture("user-clicked-viewevent", {
+                      event_link: data.htmlLink,
+                    });
+                  }}
+                >
+                  Click here to view event
+                </a>
+                <ExternalLink className="h-3 w-3" />
+              </span>
+            ),
+          });
+        }
         if (!response.ok) {
           setViewModal(true);
           // const errorText = await response.text();
@@ -170,30 +198,6 @@ export default function Dashb() {
           // );
           throw new Error(`Error creating event: ${response.statusText}`);
         }
-
-        const data = await response.json();
-        setRecentlyCreatedEvents((prevEvents) => [...prevEvents, data]);
-        toast({
-          title: "Event created!",
-          description: (
-            <span className="flex items-center space-x-1 text-muted-foreground hover:text-foreground">
-              <a
-                href={data.htmlLink}
-                className="underline"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => {
-                  posthog.capture("user-clicked-viewevent", {
-                    event_link: data.htmlLink,
-                  });
-                }}
-              >
-                Click here to view event
-              </a>
-              <ExternalLink className="h-3 w-3" />
-            </span>
-          ),
-        });
       }
     } catch (error) {
       setViewModal(true);
@@ -305,7 +309,7 @@ export default function Dashb() {
   return (
     <>
       <Header />
-
+      <Toaster />
       <div className="relative min-h-[350px] md:min-h-[605px] w-full px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-0">
         <div className="md:w-full flex-col md:flex items-center justify-center">
           <div className="md:flex items-center md:items-start gap-4">
@@ -368,7 +372,7 @@ export default function Dashb() {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="p-2 border rounded w-full focus:outline-none focus:ring-2 focus:ring-gray-500"
                 />
-                <Search className="text-gray-400 absolute right-3 top-1/2 transform -translate-y-1/2" />
+                <Search className="text-gray-300 absolute right-3 top-1/2 transform -translate-y-1/2" />
               </div>
 
               <ul className="flex-col space-y-5">

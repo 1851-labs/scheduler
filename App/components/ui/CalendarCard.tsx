@@ -68,7 +68,7 @@ export default function CalendarCard({
         </CardHeader>
         {description && (
           <CardContent>
-            <div className="flex break-words whitespace-normal overflow-hidden ">
+            <div className="flex break-words whitespace-normal overflow-hidden md:max-w-[600px]">
               {truncatedDescription}
             </div>
           </CardContent>

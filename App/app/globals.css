@@ -229,6 +229,7 @@ specified below to the foreground text.
 
     /* The color used for the background of cards */
     --card: 172 29% 89%;
+    /* --card: 228 35% 92%; */
 
     /* The color used for foreground objects of cards (i.e. text) */
     --card-foreground: 222.2 47.4% 11.2%;

@@ -38,7 +38,7 @@ const Header = () => {
 
   const handleLogout = (e: any) => {
     googleLogout();
-    const [user, setUser] = useState<User | null>(null);
+    logout();
     router.push("/");
     posthog.capture("user-clicked-logout");
   };
@@ -62,7 +62,7 @@ const Header = () => {
             <Button variant="ghost" className="flex items-center space-x-2">
               <Avatar className="h-6 w-6">
                 <AvatarImage src={user?.picture} alt={user?.name} />
-                <AvatarFallback>{user?.name}</AvatarFallback>
+                {/* <AvatarFallback>{user?.name}</AvatarFallback> */}
               </Avatar>
               <span>{user?.name}</span>
               <ChevronDown className="h-4 w-4 opacity-50" />

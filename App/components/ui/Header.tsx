@@ -15,6 +15,15 @@ import { useAuth } from "@/lib/authContext";
 import { googleLogout } from "@react-oauth/google";
 import { usePostHog } from "posthog-js/react";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { set } from "date-fns";
+
+interface User {
+  name: string;
+  email: string;
+  picture: string;
+  given_name: string;
+}
 
 const Header = () => {
   const { accessToken } = useAuth();
@@ -29,10 +38,20 @@ const Header = () => {
 
   const handleLogout = (e: any) => {
     googleLogout();
-    logout();
+    const [user, setUser] = useState<User | null>(null);
     router.push("/");
     posthog.capture("user-clicked-logout");
   };
+
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const storedUser = sessionStorage.getItem("user");
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+      setUser(user);
+    }
+  }, []);
 
   return (
     <header className="flex justify-between items-center bg-background p-6 md:px-10">
@@ -41,14 +60,11 @@ const Header = () => {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="flex items-center space-x-2">
-              <Avatar className="h-8 w-8">
-                <AvatarImage
-                  src="../public/images/profile.jpeg"
-                  alt="{user.name}"
-                />
-                {/* <AvatarFallback>{user.name.charAt(0)}</AvatarFallback> */}
+              <Avatar className="h-6 w-6">
+                <AvatarImage src={user?.picture} alt={user?.name} />
+                <AvatarFallback>{user?.name}</AvatarFallback>
               </Avatar>
-              <span>Megan Wu</span>
+              <span>{user?.name}</span>
               <ChevronDown className="h-4 w-4 opacity-50" />
             </Button>
           </DropdownMenuTrigger>

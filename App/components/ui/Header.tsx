@@ -1,71 +1,82 @@
 "use client";
 
-import { useUser } from "@clerk/clerk-react";
-import Link from "next/link";
-import { UserNav } from "./UserNav";
-import { useConvexAuth } from "convex/react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarImage, AvatarFallback } from "./avatar";
+import { Button } from "./button";
+import { ChevronDown, LogOut, Settings } from "lucide-react";
+import { useAuth } from "@/lib/authContext";
+import { googleLogout } from "@react-oauth/google";
+import { usePostHog } from "posthog-js/react";
+import { useRouter } from "next/navigation";
 
 const Header = () => {
-  const { isLoading } = useConvexAuth();
-  const { user } = useUser();
+  const { accessToken } = useAuth();
+  const { logout } = useAuth();
+  const posthog = usePostHog();
+  const router = useRouter();
 
   const handleRefresh = (e: any) => {
     e.preventDefault();
     window.location.href = "/";
   };
+
+  const handleLogout = (e: any) => {
+    googleLogout();
+    logout();
+    router.push("/");
+    posthog.capture("user-clicked-logout");
+  };
+
   return (
-    <div className="z-10 container relative m-0 mx-auto py-10 md:px-10">
-      <div className="flex items-left ml-2 justify-between">
-        <Link className="flex w-fit items-center gap-[2px]" href="/">
-          <h1 className="text-xl font-medium text-[#25292F] md:text-3xl  text-foreground/90 hover:text-foreground">
-            VoCal
-          </h1>
-        </Link>
-        {/* <Link
-          href="/"
-          onClick={handleRefresh}
-          className="hover:text-foreground/60"
-        >
-          Home
-        </Link> */}
-        {/* <Link
-          href="/sign-in"
-          className=" text-foreground/50 hover:text-foreground/80"
-        >
-          Sign up
-        </Link> */}
-        {/* <Link href="/component-library">View UI Examples</Link> */}
-        {/* buttons */}
-        {/* login / user menu */}
-        {/*
-        <div className="flex w-fit items-center gap-[22px]">
-          {isLoading ? (
-            <></>
-          ) : user ? (
-            <>
-              <Link
-                href={'/dashboard'}
-                className="hidden cursor-pointer text-lg text-dark md:inline-block lg:text-xl"
-              >
-                Your Stories
-              </Link>
-              <UserNav
-                image={user?.imageUrl}
-                name={user?.fullName!}
-                email={user?.primaryEmailAddress?.emailAddress!}
-              />
-            </>
-          ) : (
-            <Link href="/dashboard">
-              <button className="text-md primary-gradient primary-shadow rounded-lg px-5 py-1 text-center text-light md:px-10 md:py-2 md:text-xl">
-                Sign in
-              </button>
-            </Link>
-          )}
-        </div>
-        */}
-      </div>
-    </div>
+    <header className="flex justify-between items-center bg-background p-6 md:px-10">
+      <h1 className="text-2xl font-bold">VoCal</h1>
+      {accessToken && (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="flex items-center space-x-2">
+              <Avatar className="h-8 w-8">
+                <AvatarImage
+                  src="../public/images/profile.jpeg"
+                  alt="{user.name}"
+                />
+                {/* <AvatarFallback>{user.name.charAt(0)}</AvatarFallback> */}
+              </Avatar>
+              <span>Megan Wu</span>
+              <ChevronDown className="h-4 w-4 opacity-50" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>
+              <Settings className="mr-2 h-4 w-4" />
+              <span>Settings</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
+              <LogOut className="mr-2 h-4 w-4" />
+              <span>Log out</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
+    </header>
+    // <div className="z-10 container relative m-0 mx-auto py-10 md:px-10">
+    //   <div className="flex items-left ml-2 justify-between">
+    //     <Link className="flex w-fit items-center gap-[2px]" href="/">
+    //       <h1 className="text-xl font-medium text-[#25292F] md:text-3xl  text-foreground/90 hover:text-foreground">
+    //         VoCal
+    //       </h1>
+    //     </Link>
+
+    //   </div>
+    // </div>
   );
 };
 

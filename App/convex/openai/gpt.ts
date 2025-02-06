@@ -306,8 +306,8 @@ const transcriptSchema = z.object({
 const TRANSCRIPT_SYS_PROMPT: PromptTemplate = PromptTemplate.fromTemplate(
   `You're an expert in natural language processing and information extraction. 
   Your task is to extract specific details from a given text. 
-  Ensure that dates are formatted like so, "2024-09-11" and startTime and endTime is formatted in ISO 8601 format, e.g., "09:00:00". 
-  If the year is not specified in the transcript, assume it is 2024. 
+  Ensure that dates are formatted like so, "2025-09-11" and startTime and endTime is formatted in ISO 8601 format, e.g., "09:00:00". 
+  If the year is not specified in the transcript, assume it is 2025. 
   If a startTime or endTime is not specified, leave it undefined.
   If a startTime is mentioned without an endTime, assume the endTime is 1 hour after the startTime.
   Be specific in your answers and use common sense. Answer in valid JSON format.`
@@ -315,9 +315,9 @@ const TRANSCRIPT_SYS_PROMPT: PromptTemplate = PromptTemplate.fromTemplate(
 const TRANSCRIPT_USER_PROMPT: PromptTemplate = PromptTemplate.fromTemplate(
   `Extract the event details from the following transcript. 
   The details should include the location, date, and time of the event. 
-  Ensure that dates are formatted like so, "2024-09-11".
+  Ensure that dates are formatted like so, "2025-09-11".
   startTime and endTime should be in ISO 8601 format, e.g., "09:00:00". 
-  If the year is not specified in the transcript, assume it is 2024. 
+  If the year is not specified in the transcript, assume it is 2025. 
   If a startTime or endTime is not specified, leave it undefined.
   If a startTime is mentioned without an endTime, assume the endTime is 1 hour after the startTime.
   If a location is not specified, leave it undefined.

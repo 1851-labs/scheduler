@@ -33,13 +33,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, []);
 
   const login = (token: any) => {
-    sessionStorage.setItem("accessToken", token); // Save token to sessionStorage
-    setAccessToken(token); // Update state
+    sessionStorage.setItem("accessToken", token);
+    setAccessToken(token);
   };
 
   const logout = () => {
-    sessionStorage.removeItem("accessToken"); // Remove token from sessionStorage
-    setAccessToken(null); // Clear state
+    sessionStorage.removeItem("accessToken");
+    setAccessToken(null);
   };
 
   return (

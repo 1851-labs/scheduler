@@ -83,6 +83,7 @@ const Banner = () => {
 
       const userInfo = await response.json();
       setUserProfile(userInfo);
+      sessionStorage.setItem("user", JSON.stringify(userInfo));
     } catch (error) {
       console.error("Error fetching user info:", error);
     }
